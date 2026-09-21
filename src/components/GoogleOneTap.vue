@@ -14,7 +14,7 @@ const initializeGoogleOneTap = () => {
   // 2. Initialize One Tap
   window.google.accounts.id.initialize({
     // IMPORTANT: This must match the "Web client ID" from Firebase Authentication settings
-    client_id: "563844962607-l97k6aknol8n3duh1bgi0k17tknf9atf.apps.googleusercontent.com", 
+    client_id: "480767747886-h1br8thba1pssuv78ctkfp37snshrcnb.apps.googleusercontent.com", 
     
     // The callback when user clicks "Sign In"
     callback: handleCredentialResponse,
