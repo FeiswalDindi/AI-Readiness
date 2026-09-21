@@ -4,7 +4,7 @@ import { getFirestore } from "firebase/firestore"; // [NEW] Import Database
 
 // YOUR CONFIG (Keep your own keys here!)
 const firebaseConfig = {
-  apiKey: "AIzaSyBsdoUCS5OGRz_0rZnZEj5e8bAFivjdsOw",
+  apiKey: "AIzaSyBsdouCS50GRZ_0rZnZEj5e8bAFivjdsOw",
   authDomain: "ai-readiness-b3883.firebaseapp.com",
   projectId: "ai-readiness-b3883",
   storageBucket: "ai-readiness-b3883.firebasestorage.app",
