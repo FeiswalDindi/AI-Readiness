@@ -4,12 +4,13 @@ import { getFirestore } from "firebase/firestore"; // [NEW] Import Database
 
 // YOUR CONFIG (Keep your own keys here!)
 const firebaseConfig = {
-  apiKey: "AIzaSyAjb-zCuKRduJHdfhZmXVb8IUaRP_P_6LY",
-  authDomain: "ra-consulting-app.firebaseapp.com",
-  projectId: "ra-consulting-app",
-  storageBucket: "ra-consulting-app.appspot.com",
-  messagingSenderId: "123456...",
-  appId: "1:123456..."
+  apiKey: "AIzaSyBsdoUCS5OGRz_OrZnZEj5e8bAFivjdsOw",
+  authDomain: "ai-readiness-b3883.firebaseapp.com",
+  projectId: "ai-readiness-b3883",
+  storageBucket: "ai-readiness-b3883.firebasestorage.app",
+  messagingSenderId: "480767747886",
+  appId: "1:480767747886:web:f9b743198bb3ee207afcbf",
+  measurementId: "G-E2BQXJN380"
 };
 
 // 1. Initialize Firebase
