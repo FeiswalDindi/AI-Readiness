@@ -1,0 +1,70 @@
+html {
+    scroll-behavior: smooth;
+}
+
+/* FORCE NAVY BLUE THEME - HIGH PRIORITY */
+
+:root {
+    --bs-primary: #1a2b49; 
+    --bs-primary-rgb: 26, 43, 73;
+    --bs-link-color: #1a2b49;
+}
+
+/* 1. Force Backgrounds (added 'body' for strength) */
+body .bg-primary {
+    background-color: #1a2b49 !important;
+
+}
+
+/* 2. Force Text (added 'body' for strength) */
+body .text-primary {
+    color: #1a2b49 !important;
+}
+
+/* 3. Force Buttons */
+body .btn-primary {
+    background-color: #1a2b49 !important;
+    border-color: #1a2b49 !important;
+    color: white !important;
+}
+
+body .btn-primary:hover {
+    background-color: #0d1729 !important; /* Darker navy on hover */
+    border-color: #0d1729 !important;
+}
+
+body .btn-outline-primary {
+    color: #1a2b49 !important;
+    border-color: #1a2b49 !important;
+}
+
+body .btn-outline-primary:hover {
+    background-color: #1a2b49 !important;
+    color: white !important;
+}
+body {
+    padding-top: 80px; /* Pushes content down so the navbar doesn't cover it */
+}
+
+/* --- SCROLL REVEAL ANIMATIONS --- */
+
+/* 1. Initial State: Hidden and shifted down */
+.before-enter {
+    opacity: 0;
+    transform: translateY(80px); /* Start 80px below final position */
+    transition: opacity 0.8s cubic-bezier(0.25, 0.46, 0.45, 0.94), 
+                transform 0.8s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+    /* NOTE: The cubic-bezier makes the movement start fast and slow down smoothly */
+}
+
+/* 2. Final State: Visible and back to original position */
+.enter {
+    opacity: 1;
+    transform: translateY(0);
+}
+
+/* Utility classes to stagger animations (one after another) */
+.delay-100 { transition-delay: 100ms; }
+.delay-200 { transition-delay: 200ms; }
+.delay-300 { transition-delay: 300ms; }
+.delay-400 { transition-delay: 400ms; }

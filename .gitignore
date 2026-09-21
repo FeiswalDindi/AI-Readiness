@@ -1,0 +1,15 @@
+# Logs
+logs
+*.log
+npm-debug.log*
+
+# Dependencies
+node_modules
+
+# Production build folder (You will generate this later!)
+dist
+
+# Environment variables (THIS HIDES YOUR API KEY!)
+.env
+.env.*
+!.env.example
