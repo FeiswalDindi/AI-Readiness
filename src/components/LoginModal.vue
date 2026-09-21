@@ -76,8 +76,10 @@ const handleSubmit = async () => {
 
 const handleGoogle = async () => {
   try {
-    await signInWithPopup(auth, googleProvider);
+    const result = await signInWithPopup(auth, googleProvider);
+    await store.googleLogin(result.user);
     store.closeModal();
+    router.push('/dashboard');
   } catch (error) {
     errorMessage.value = "Google sign-in failed.";
   }

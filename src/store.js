@@ -153,6 +153,23 @@ export const store = reactive({
     return false;
   },
 
+  async googleLogin(firebaseUser) {
+    const loggedInUser = {
+        displayName: firebaseUser.displayName || 'Valued Client',
+        email: firebaseUser.email,
+        role: 'client',
+        uid: firebaseUser.uid,
+        avatar: firebaseUser.photoURL || `https://ui-avatars.com/api/?name=${firebaseUser.email}&background=0ea5e9&color=fff`
+    };
+    
+    this.user = loggedInUser;
+    this.isAdmin = false;
+    sessionStorage.setItem('ra_session_active', 'true');
+    localStorage.setItem(USER_KEY, JSON.stringify(loggedInUser));
+    this.trackActivity("Login", `User logged in via Google: ${loggedInUser.email}`);
+    return true;
+  },
+
   async signup(name, email, password) {
       try {
           const userCredential = await createUserWithEmailAndPassword(auth, email, password);
