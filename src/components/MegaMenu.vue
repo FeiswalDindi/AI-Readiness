@@ -22,13 +22,12 @@ const emit = defineEmits(['close']);
 </div>
            
            <div class="col-lg-4 mb-3 mb-lg-0">
-              <h6 class="text-gold fw-bold text-uppercase border-bottom border-gold pb-2 mb-3">Our Solutions</h6>
+              <h6 class="text-gold fw-bold text-uppercase border-bottom border-gold pb-2 mb-3">Project Focus</h6>
               <ul class="list-unstyled">
-                 <li><router-link class="mega-link" to="/services/research" @click="$emit('close')">Research, Policy & M&E</router-link></li>
-                 <li><router-link class="mega-link" to="/services/strategy" @click="$emit('close')">Strategic Corporate Advisory</router-link></li>
-                 <li><router-link class="mega-link" to="/services/ict" @click="$emit('close')">ICT & Data Analytics</router-link></li>
-                 <li><router-link class="mega-link" to="/services/products" @click="$emit('close')">Products & Solutions</router-link></li>
-                 <li><router-link class="mega-link fw-bold mt-2 d-inline-block text-gold explore-link" to="/services" @click="$emit('close')">Explore All Solutions →</router-link></li>
+                 <li><router-link class="mega-link" to="/insights" @click="$emit('close')">Job Market Analysis</router-link></li>
+                 <li><router-link class="mega-link" to="/insights" @click="$emit('close')">Curriculum Development</router-link></li>
+                 <li><router-link class="mega-link" to="/insights" @click="$emit('close')">AI Tool Adoption</router-link></li>
+                 <li><router-link class="mega-link fw-bold mt-2 d-inline-block text-gold explore-link" to="/insights" @click="$emit('close')">Read our Insights →</router-link></li>
               </ul>
            </div>
 

@@ -81,7 +81,7 @@ const handleGoogle = async () => {
     store.closeModal();
     router.push('/dashboard');
   } catch (error) {
-    errorMessage.value = "Google sign-in failed.";
+    errorMessage.value = `Google sign-in failed: ${error.message}`;
   }
 };
 

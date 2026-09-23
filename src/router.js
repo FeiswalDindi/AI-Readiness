@@ -15,56 +15,56 @@ const routes = [
         path: '/', 
         name: 'home',
         component: HomeView,
-        meta: { title: 'Home | RA Consulting' } 
+        meta: { title: 'Home | AI Readiness Project' } 
     },
     { 
         path: '/about', 
         name: 'about',
         component: AboutView,
-        meta: { title: 'About Us | RA Consulting' }
+        meta: { title: 'About Research | AI Readiness Project' }
     },
     { 
         path: '/contact', 
         name: 'contact',
         component: ContactView,
-        meta: { title: 'Contact Us | RA Consulting' }
+        meta: { title: 'Contact Us | AI Readiness Project' }
     },
     {
         path: '/services/:serviceId?', 
         name: 'services',
         component: ServicesView,
         props: true,
-        meta: { title: 'Our Services | RA Consulting' }
+        meta: { title: 'Project Focus | AI Readiness Project' }
     },
     { 
         path: '/careers', 
         name: 'careers',
         component: CareersView,
-        meta: { title: 'Join Our Team | RA Consulting' }
+        meta: { title: 'Research Assistants | AI Readiness Project' }
     },
     { 
         path: '/partners', 
         name: 'partners',
         component: CareersView, 
-        meta: { title: 'Partner With Us | RA Consulting' }
+        meta: { title: 'Partner With Us | AI Readiness Project' }
     },
     { 
         path: '/insights', 
         name: 'insights',
         component: InsightsView,
-        meta: { title: 'Insights & Resources | RA Consulting' }
+        meta: { title: 'Research Findings | AI Readiness Project' }
     },
     { 
         path: '/admin', 
         name: 'admin', 
         component: AdminDashboardView,
-        meta: { title: 'Administration | RA Consulting' }
+        meta: { title: 'Administration | AI Readiness Project' }
     },
     { 
         path: '/dashboard', 
         name: 'dashboard',
         component: DashboardView,
-        meta: { title: 'My Dashboard | RA Consulting' }
+        meta: { title: 'My Dashboard | AI Readiness Project' }
     }
 ];
 
@@ -83,7 +83,7 @@ const router = createRouter({
 
 // --- 2. Title Updater ---
 router.afterEach((to) => {
-    document.title = to.meta.title || 'RA Strategic & Analytics Consulting';
+    document.title = to.meta.title || 'AI Readiness Project';
 });
 
 

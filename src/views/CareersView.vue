@@ -67,9 +67,9 @@ const submitApplication = async (event) => {
     
     <section class="py-5 bg-navy text-white text-center" style="padding-top: 120px !important;">
       <div class="container py-5 mt-4">
-        <h1 class="display-3 fw-bold mb-3">Work With Us</h1>
+        <h1 class="display-3 fw-bold mb-3">Get Involved</h1>
         <p class="lead text-white-50 mx-auto" style="max-width: 700px;">
-            Join a team of innovators, analysts, and strategists dedicated to transforming institutions across East Africa.
+            Join our multidisciplinary research team or partner with us as an institution to drive AI readiness across East Africa.
         </p>
       </div>
     </section>
@@ -85,13 +85,13 @@ const submitApplication = async (event) => {
                     <path d="M6.5 1A1.5 1.5 0 0 0 5 2.5V3H1.5A1.5 1.5 0 0 0 0 4.5v8A1.5 1.5 0 0 0 1.5 14h13a1.5 1.5 0 0 0 1.5-1.5v-8A1.5 1.5 0 0 0 14.5 3H11v-.5A1.5 1.5 0 0 0 9.5 1h-3zm0 1h3a.5.5 0 0 1 .5.5V3H6v-.5a.5.5 0 0 1 .5-.5zm1.886 6.914L15 7.151V12.5a.5.5 0 0 1-.5.5h-13a.5.5 0 0 1-.5-.5V7.15l6.614 1.764a1.5 1.5 0 0 0 1.172 0zM1.5 4h13a.5.5 0 0 1 .5.5v1.616L8.129 7.948a.5.5 0 0 1-.258 0L1 6.116V4.5a.5.5 0 0 1 .5-.5z"/>
                   </svg>
               </div>
-              <h4 class="fw-bold text-navy mb-3">Careers & Internships</h4>
+              <h4 class="fw-bold text-navy mb-3">Research Assistants</h4>
               <p class="text-muted mb-4 px-lg-3 text-sm">
-                We are always looking for talented Policy Analysts, Data Scientists, and Strategy Consultants.
+                We are actively looking for student researchers, data analysts, and field coordinators to help administer surveys.
               </p>
               <div class="mt-auto">
                 <button @click="openForm('career')" class="btn btn-outline-navy rounded-pill px-5 py-2 fw-bold w-100">
-                    View Openings
+                    Apply Now
                 </button>
               </div>
             </div>
@@ -105,13 +105,13 @@ const submitApplication = async (event) => {
                     <path fill-rule="evenodd" d="M9.972 2.508a.5.5 0 0 0-.16-.556l-.178-.129a5.009 5.009 0 0 0-2.076-.783C6.215.862 4.504 1.229 2.84 3.133H1.786a.5.5 0 0 0-.354.147L.146 4.567a.5.5 0 0 0 0 .706l2.571 2.579a.5.5 0 0 0 .708 0l1.286-1.29a.5.5 0 0 0 .146-.353V5.57l8.387 8.873A.5.5 0 0 0 14 14.5l1.5-1.5a.5.5 0 0 0 .017-.689l-9.129-8.63c.747-.456 1.772-.839 3.112-.839a.5.5 0 0 0 .472-.334z"/>
                   </svg>
               </div>
-              <h4 class="fw-bold text-navy mb-3">Partner With Us</h4>
+              <h4 class="fw-bold text-navy mb-3">Institutional Partners</h4>
               <p class="text-muted mb-4 px-lg-3 text-sm">
-                Are you a specialized consultant or technology firm? Let's collaborate to deliver superior value.
+                Are you a University administrator or Policymaker? Partner with us to integrate our findings into curriculum design.
               </p>
               <div class="mt-auto">
                 <button @click="openForm('partner')" class="btn btn-outline-navy rounded-pill px-5 py-2 fw-bold w-100">
-                    Collaboration Form
+                    Partner With Us
                 </button>
               </div>
             </div>
@@ -132,7 +132,7 @@ const submitApplication = async (event) => {
 
                     <div class="bg-light-grey p-4 border-bottom text-center">
                         <h4 class="fw-bold text-navy m-0">
-                            {{ activeForm === 'career' ? 'Career & Internship Application' : 'Partnership Proposal' }}
+                            {{ activeForm === 'career' ? 'Research Assistant Application' : 'Institutional Partnership Proposal' }}
                         </h4>
                     </div>
 
@@ -170,9 +170,8 @@ const submitApplication = async (event) => {
                                     <select name="Role_Applied_For" class="custom-input" required>
                                         <option value="">Select a role...</option>
                                         <option>Data Analyst</option>
-                                        <option>Research Consultant</option>
-                                        <option>ICT Systems Developer</option>
-                                        <option>General Internship</option>
+                                        <option>Field Coordinator</option>
+                                        <option>Student Researcher</option>
                                     </select>
                                 </div>
                                 <div class="col-md-6">
@@ -192,7 +191,7 @@ const submitApplication = async (event) => {
                         <form v-if="activeForm === 'partner' && !feedback" @submit.prevent="submitApplication">
                             <div class="row g-4 mb-4">
                                 <div class="col-md-6">
-                                    <label class="form-label small fw-bold text-muted">Organization / Consultant Name</label>
+                                    <label class="form-label small fw-bold text-muted">Institution Name</label>
                                     <input type="text" name="Organization_Name" class="custom-input" required>
                                 </div>
                                 <div class="col-md-6">
@@ -201,10 +200,10 @@ const submitApplication = async (event) => {
                                 </div>
                                 <div class="col-12">
                                     <label class="form-label small fw-bold text-muted">Partnership Proposal</label>
-                                    <textarea name="Proposal_Details" rows="5" class="custom-input" placeholder="Describe how we can collaborate and the expertise you bring..." required></textarea>
+                                    <textarea name="Proposal_Details" rows="5" class="custom-input" placeholder="Describe how your institution can collaborate..." required></textarea>
                                 </div>
                                 <div class="col-12">
-                                    <label class="form-label small fw-bold text-muted">Company Profile (Optional)</label>
+                                    <label class="form-label small fw-bold text-muted">Institutional Profile (Optional)</label>
                                     <input type="file" name="Company_Profile_Attachment" class="custom-input file-input" accept=".pdf">
                                 </div>
                             </div>

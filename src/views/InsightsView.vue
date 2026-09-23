@@ -10,25 +10,25 @@ const API_KEY = 'pub_2c579651e55e434ca7118343e55a9720';
 
 const BACKUP_NEWS = [
     {
-        title: "Kenya's Digital Economy Expected to Grow by 5.2% in 2026",
-        description: "New reports indicate a massive surge in fintech adoption and cloud infrastructure across Nairobi.",
-        image_url: "https://images.unsplash.com/photo-1451187580459-43490279c0fa?auto=format&fit=crop&q=80",
+        title: "Kenya introduces new AI guidelines for Universities",
+        description: "Ministry of Education publishes a comprehensive framework for ethical AI adoption in Higher Education institutions across the country.",
+        image_url: "https://images.unsplash.com/photo-1488190211105-8b0e65b80b4e?w=500&auto=format&fit=crop",
         link: "#",
-        source_id: "RA Insights",
+        source_id: "Tech News Africa",
         pubDate: new Date().toISOString()
     },
     {
-        title: "Nairobi Securities Exchange Adopts AI for Market Analysis",
-        description: "The NSE has partnered with global tech firms to integrate predictive analytics for better trading outcomes.",
-        image_url: "https://images.unsplash.com/photo-1590283603385-17ffb3a7f29f?auto=format&fit=crop&q=80",
+        title: "How Gen-Z is adopting AI in Job Searches",
+        description: "A recent survey shows that over 65% of fresh graduates are using AI tools to draft resumes and prepare for interviews.",
+        image_url: "https://images.unsplash.com/photo-1522202176988-66273c2fd55f?w=500&auto=format&fit=crop",
         link: "#",
-        source_id: "Business Daily",
+        source_id: "Education Weekly",
         pubDate: new Date().toISOString()
     },
     {
-        title: "Government Launches New Policy for Sustainable Manufacturing",
-        description: "The Ministry of Trade announces tax incentives for companies adopting green energy solutions.",
-        image_url: "https://images.unsplash.com/photo-1581091226825-a6a2a5aee158?auto=format&fit=crop&q=80",
+        title: "Ministry of Education partners with tech giants",
+        description: "New coalition aims to bridge the digital divide by providing AI-ready infrastructure to rural educational institutions.",
+        image_url: "https://images.unsplash.com/photo-1552664730-d307ca884978?w=500&auto=format&fit=crop",
         link: "#",
         source_id: "Policy Brief",
         pubDate: new Date().toISOString()

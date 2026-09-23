@@ -76,7 +76,7 @@ onUnmounted(() => {
     <div class="container position-relative">
       
       <router-link class="navbar-brand fw-bold brand-container" to="/" @click="closeMenu">
-        <span class="brand-text" :class="isScrolled ? 'text-navy' : 'text-white'">RA Consulting</span>
+        <span class="brand-text" :class="isScrolled ? 'text-navy' : 'text-white'">AI Readiness</span>
         <img :src="logoImg" alt="RA Logo" class="brand-logo" :class="{ 'show-logo': isScrolled }">
       </router-link>
 
