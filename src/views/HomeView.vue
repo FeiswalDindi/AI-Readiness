@@ -161,26 +161,44 @@ onUnmounted(() => {
     </header>
 
     <!-- MISSION / VISION -->
-    <section class="py-5 bg-light">
+    <section class="py-5 bg-white">
         <div class="container py-4">
-            <div class="row g-4">
-                <div class="col-md-6" v-scroll-reveal="{ delay: 100 }">
-                    <div class="card h-100 border-0 shadow-sm p-4 rounded-4 text-center mission-card">
-                        <div class="icon-circle mx-auto mb-3 text-gold">
-                            <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" fill="currentColor" viewBox="0 0 16 16"><path d="M8 15A7 7 0 1 1 8 1a7 7 0 0 1 0 14m0 1A8 8 0 1 0 8 0a8 8 0 0 0 0 16"/><path d="M5.255 5.786a.237.237 0 0 0 .241.247h.825c.138 0 .248-.113.266-.25.09-.656.54-1.134 1.342-1.134.686 0 1.314.343 1.314 1.168 0 .635-.374.927-.965 1.371-.673.489-1.206 1.06-1.168 1.987l.003.217a.25.25 0 0 0 .25.246h.811a.25.25 0 0 0 .25-.25v-.105c0-.718.273-.927 1.01-1.486.609-.463 1.244-.977 1.244-2.056 0-1.511-1.276-2.241-2.673-2.241-1.267 0-2.655.59-2.75 2.286M7.5 13h1a.5.5 0 0 0 .5-.5v-1a.5.5 0 0 0-.5-.5h-1a.5.5 0 0 0-.5.5v1a.5.5 0 0 0 .5.5"/></svg>
+            <div class="mission-vision-container shadow-lg" v-scroll-reveal="{ delay: 100 }">
+                <div class="row g-0 h-100 position-relative z-2">
+                    
+                    <!-- VISION (Left, Orange side) -->
+                    <div class="col-md-6 p-5 d-flex flex-column text-white position-relative" style="min-height: 350px;">
+                        <div class="mb-4 text-start">
+                            <h2 class="fw-bold display-5 text-uppercase mb-3" style="line-height: 1.1; letter-spacing: -1px;">Our<br>Vision</h2>
+                            <p class="fs-6 opacity-75 pe-md-4" style="line-height: 1.6;">{{ store.content.vision }}</p>
                         </div>
-                        <h3 class="fw-bold text-navy mb-3 position-relative d-inline-block card-title-underline">Our Mission</h3>
-                        <p class="text-muted fs-5 lh-lg">{{ store.content.mission }}</p>
-                    </div>
-                </div>
-                <div class="col-md-6" v-scroll-reveal="{ delay: 200 }">
-                    <div class="card h-100 border-0 shadow-sm p-4 rounded-4 text-center mission-card">
-                        <div class="icon-circle mx-auto mb-3 text-gold">
-                            <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" fill="currentColor" viewBox="0 0 16 16"><path d="M8 16a2 2 0 0 0 2-2H6a2 2 0 0 0 2 2M8 1.918l-.797.161A4 4 0 0 0 4 6c0 .628-.134 2.197-.459 3.742-.16.767-.376 1.566-.663 2.258h10.244c-.287-.692-.502-1.49-.663-2.258C12.134 8.197 12 6.628 12 6a4 4 0 0 0-3.203-3.92zM14.22 12c.223.447.481.801.78 1H1c.299-.199.557-.553.78-1C2.68 10.2 3 6.88 3 6c0-2.42 1.72-4.44 4.005-4.901a1 1 0 1 1 1.99 0A5 5 0 0 1 13 6c0 .88.32 4.2 1.22 6"/></svg>
+                        <div class="mt-auto pt-4 text-start">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="60" height="60" fill="currentColor" viewBox="0 0 16 16">
+                                <path d="M10.5 8a2.5 2.5 0 1 1-5 0 2.5 2.5 0 0 1 5 0z"/>
+                                <path d="M0 8s3-5.5 8-5.5S16 8 16 8s-3 5.5-8 5.5S0 8 0 8zm8 3.5a3.5 3.5 0 1 0 0-7 3.5 3.5 0 0 0 0 7z"/>
+                            </svg>
                         </div>
-                        <h3 class="fw-bold text-navy mb-3 position-relative d-inline-block card-title-underline">Our Vision</h3>
-                        <p class="text-muted fs-5 lh-lg">{{ store.content.vision }}</p>
                     </div>
+
+                    <!-- MISSION (Right, Light gray side) -->
+                    <div class="col-md-6 p-5 d-flex flex-column text-navy position-relative" style="min-height: 350px;">
+                        <div class="text-end mb-4">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="60" height="60" fill="#1b2c57" viewBox="0 0 16 16">
+                                <path d="M8 15A7 7 0 1 1 8 1a7 7 0 0 1 0 14zm0 1A8 8 0 1 0 8 0a8 8 0 0 0 0 16z"/>
+                                <path d="M8 13A5 5 0 1 1 8 3a5 5 0 0 1 0 10zm0 1A6 6 0 1 0 8 2a6 6 0 0 0 0 12z"/>
+                                <path d="M8 11A3 3 0 1 1 8 5a3 3 0 0 1 0 6zm0 1A4 4 0 1 0 8 4a4 4 0 0 0 0 8z"/>
+                                <path d="M9.5 6.5a1.5 1.5 0 1 1-3 0 1.5 1.5 0 0 1 3 0z"/>
+                                <path d="M11.354 4.646a.5.5 0 0 1 0 .708l-2 2a.5.5 0 0 1-.708-.708l2-2a.5.5 0 0 1 .708 0z"/>
+                                <path d="M11.854 3.146a.5.5 0 0 1 .708 0l2 2a.5.5 0 0 1-.708.708l-2-2a.5.5 0 0 1 0-.708z"/>
+                                <path d="M14.5 2.5a.5.5 0 0 1 .5.5v3a.5.5 0 0 1-1 0V3.707L11.854 5.854a.5.5 0 0 1-.708-.708L13.293 3H11.5a.5.5 0 0 1 0-1h3z"/>
+                            </svg>
+                        </div>
+                        <div class="mt-auto text-end">
+                            <h2 class="fw-bold display-5 text-uppercase mb-3" style="line-height: 1.1; letter-spacing: -1px; color: #1b2c57;">Our<br>Mission</h2>
+                            <p class="fs-6 text-muted ms-auto" style="line-height: 1.6; max-width: 90%;">{{ store.content.mission }}</p>
+                        </div>
+                    </div>
+
                 </div>
             </div>
         </div>
@@ -374,10 +392,27 @@ onUnmounted(() => {
 
 .platform-icon-wrap svg { filter: drop-shadow(0 2px 4px rgba(0,0,0,0.1)); }
 
-.mission-card { transition: all 0.3s ease; border: 1px solid transparent !important; }
-.mission-card:hover { transform: translateY(-10px); box-shadow: 0 15px 30px rgba(27, 44, 87, 0.08) !important; border-color: rgba(190, 164, 41, 0.3) !important; }
-.card-title-underline::after { content: ''; position: absolute; bottom: -8px; left: 50%; transform: translateX(-50%); width: 40px; height: 3px; background: #bea429; transition: width 0.3s ease; border-radius: 2px; }
-.mission-card:hover .card-title-underline::after { width: 80px; }
+.mission-vision-container {
+    position: relative;
+    background: #f4f6fa;
+    border-radius: 30px;
+    overflow: hidden;
+}
+.mission-vision-container::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 0;
+    width: 100%; height: 100%;
+    background: linear-gradient(160deg, #f1c40f 0%, #e67e22 50%, #d35400 100%);
+    clip-path: polygon(0 0, 70% 0, 35% 100%, 0% 100%);
+    z-index: 1;
+}
+
+@media (max-width: 768px) {
+    .mission-vision-container::before {
+        clip-path: polygon(0 0, 100% 0, 100% 50%, 0% 100%);
+    }
+}
 
 .team-card { transition: all 0.3s ease; border: 1px solid transparent !important; }
 .team-card:hover { transform: translateY(-10px); box-shadow: 0 15px 30px rgba(27, 44, 87, 0.08) !important; border-color: rgba(190, 164, 41, 0.3) !important; }
