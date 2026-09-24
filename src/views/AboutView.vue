@@ -86,7 +86,7 @@ const closeMemberModal = () => {
             <div class="row g-4 justify-content-center">
                 <div class="col-md-6 col-lg-4" v-for="member in store.content.team" :key="member.name">
                     <div 
-                        class="card h-100 border-0 shadow-sm text-center team-card p-4 cursor-pointer"
+                        class="card h-100 border-0 shadow-sm text-center team-card p-4 cursor-pointer rounded-0"
                         @click="openMemberModal(member)"
                     >
                         <img :src="member.imageUrl || `https://ui-avatars.com/api/?name=${encodeURIComponent(member.name)}&background=1b2c57&color=fff&size=128`" class="rounded-circle mx-auto mb-3 shadow" style="width:120px; height:120px; object-fit: cover;" alt="Avatar">
