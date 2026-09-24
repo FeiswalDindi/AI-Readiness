@@ -46,19 +46,49 @@ export const store = reactive({
   content: loadContent() || {
     heroSlides: [], 
     hero: { buttonText: 'Take Pilot Survey' },
-    about: { title: 'AI Readiness in Education', text: 'Measuring the impact of AI in educational institutions and rapidly evolving labor markets.' },
+    about: { 
+        title: 'AI Readiness in Education', 
+        text: 'Offering highly scalable insights for universities and policymakers seeking to enhance AI readiness among graduates in rapidly evolving labour markets.\n\nGiven the low cost of this light-touch information intervention - a short, online awareness training, we expect any modest, positive results to offer a scalable policy lever for educational institutions and policymakers in Kenya and similar contexts to improve the job search processes and job market readiness of their students to the evolving job market needs.\n\nAny potential effects on willingness-to-pay for further training may also have implications for local institutions on how to improve curriculum design and post-graduate program offerings.' 
+    },
     countdownDate: '2026-12-01T10:00:00',
     posterUrl: '',
     logoUrl: '',
-    mission: 'To empower organizations across Eastern Africa with data-driven insights and strategic clarity to achieve sustainable growth and impact.',
-    vision: 'To offer scalable policy levers for educational institutions and policymakers to improve job search processes and job market readiness of students.',
+    phoneNumber: '+254768980297',
+    mission: 'To spearhead data-driven research that explores how generative AI impacts higher education and graduate employability across East Africa.',
+    vision: 'To provide universities and policymakers with actionable, evidence-based insights that bridge the gap between academic curricula and the evolving demands of an AI-driven labor market.',
     whatsappLink: 'https://chat.whatsapp.com/FDJbRo6Uhhe1nAeMQqiSbU',
     qualtricsLink: 'https://qualtricsxmqzrhrhsd5.qualtrics.com/jfe/form/SV_aXAMpt2gs4KWPdA',
     team: [
-        { name: 'Carn Ulbeck', role: 'Research Administrator' },
-        { name: 'Madam Lucy Nabalanga', role: 'Research Administrator' },
-        { name: 'Feiswal Dindi', role: 'Co-participant' },
-        { name: 'Stephen Masharia', role: 'Co-participant' }
+        { 
+            name: 'Khan Ulberg', 
+            role: 'Lead Researcher',
+            description: 'Based in the UK, Khan is the lead researcher behind the AI Readiness Project and the primary author of the upcoming foundational research paper.',
+            imageUrl: 'https://ui-avatars.com/api/?name=Khan+Ulberg&background=1b2c57&color=fff'
+        },
+        { 
+            name: 'Madam Lucy Nabalanga', 
+            role: 'Professor & Coordinator',
+            description: 'A Professor at KCA University, acting as the primary liaison connecting the UK research team with academic institutions in Kenya.',
+            imageUrl: 'https://ui-avatars.com/api/?name=Lucy+Nabalanga&background=bea429&color=fff'
+        },
+        { 
+            name: 'Alexander Njuguna', 
+            role: 'Project Supervisor',
+            description: 'Serving as a supervisor and assistant to Madam Lucy, Alexander oversees on-the-ground survey logistics and coordination.',
+            imageUrl: 'https://ui-avatars.com/api/?name=Alexander+Njuguna&background=1b2c57&color=fff'
+        },
+        { 
+            name: 'Feiswal Dindi Nyango', 
+            role: 'Software Developer & Field Assistant',
+            description: 'Technical lead for the project platform and an active field assistant, conducting surveys and gathering participant data.',
+            imageUrl: 'https://ui-avatars.com/api/?name=Feiswal+Dindi&background=bea429&color=fff'
+        },
+        { 
+            name: 'Stephen Masharia', 
+            role: 'Software Developer & Field Assistant',
+            description: 'Core software developer and field assistant, building the digital infrastructure and supporting field survey collection.',
+            imageUrl: 'https://ui-avatars.com/api/?name=Stephen+Masharia&background=1b2c57&color=fff'
+        }
     ],
     socialUpdates: [],
     resources: [] 

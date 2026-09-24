@@ -75,6 +75,9 @@ const handleAdminClick = () => {
                 <a href="mailto:feisalsdindi4@gmail.com" class="footer-link">feisalsdindi4@gmail.com</a>
              </li>
              <li>
+                <a :href="`tel:${store.content.phoneNumber}`" class="footer-link">{{ store.content.phoneNumber }}</a>
+             </li>
+             <li>
                 <a :href="store.content.whatsappLink" target="_blank" class="footer-link">Join our WhatsApp Community</a>
              </li>
            </ul>

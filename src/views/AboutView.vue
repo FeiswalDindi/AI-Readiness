@@ -21,14 +21,8 @@ import { store } from '../store';
              <h6 class="text-uppercase text-gold ls-2 mb-3 fw-bold">Project Context</h6>
              <h2 class="display-5 fw-bold mb-4 text-navy">{{ store.content.about.title }}</h2>
              
-             <p class="text-muted mb-4 lead" style="line-height: 1.8;">
-                Offering highly scalable insights for universities and policymakers seeking to enhance AI readiness among graduates in rapidly evolving labour markets.
-             </p>
-             <p class="text-muted" style="line-height: 1.8;">
-                Given the low cost of this light-touch information intervention — a short, online awareness training — we expect any modest, positive results to offer a scalable policy lever for educational institutions and policymakers in Kenya and similar contexts to improve the job search processes and job market readiness of their students to the evolving job market needs. 
-             </p>
-             <p class="text-muted" style="line-height: 1.8;">
-                Any potential effects on willingness-to-pay for further training may also have implications for local institutions on how to improve curriculum design and post-graduate program offerings.
+             <p class="text-muted mb-4 lead" style="line-height: 1.8; white-space: pre-wrap;">
+                {{ store.content.about.text }}
              </p>
           </div>
           <div class="col-lg-6">

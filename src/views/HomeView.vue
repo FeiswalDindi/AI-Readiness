@@ -42,20 +42,16 @@ onUnmounted(() => {
                 
                 <!-- Left: Info & Actions -->
                 <div class="col-lg-6 text-center text-lg-start">
-                    <span class="badge bg-gold text-navy px-3 py-2 mb-3 fs-6 fw-bold shadow-sm rounded-pill">
-                        Pilot Test Phase Active
-                    </span>
                     <h1 class="display-4 fw-bold mb-4 animate-title text-white">
-                        AI Readiness in Education
+                        {{ store.content.about.title }}
                     </h1>
                     <p class="lead mb-4 opacity-75 fs-5 animate-subtitle pe-lg-4">
-                        Measuring the impact of AI in educational institutions and rapidly evolving labor markets. 
-                        Complete our 5-question pilot survey to earn <b>20 KES airtime</b> and join the movement.
+                        {{ store.content.about.text }}
                     </p>
                     
                     <div class="d-flex flex-column flex-sm-row gap-3 mt-4 animate-buttons w-100">
                         <a :href="store.content.qualtricsLink" target="_blank" class="btn btn-gold btn-lg px-4 py-3 rounded-pill fw-bold shadow-lg">
-                            Take Pilot Survey (Earn 20 KES)
+                            Take Pilot Survey
                         </a>
                         <a :href="store.content.whatsappLink" target="_blank" class="btn btn-outline-light btn-lg px-4 py-3 rounded-pill fw-bold d-flex align-items-center justify-content-center gap-2">
                             <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="currentColor" viewBox="0 0 16 16"><path d="M13.601 2.326A7.85 7.85 0 0 0 7.994 0C3.627 0 .068 3.558.064 7.926c0 1.399.366 2.76 1.057 3.965L0 16l4.204-1.102a7.9 7.9 0 0 0 3.79.965h.004c4.368 0 7.926-3.558 7.93-7.93A7.9 7.9 0 0 0 13.6 2.326zM7.994 14.521a6.6 6.6 0 0 1-3.356-.92l-.24-.144-2.494.654.666-2.433-.156-.251a6.56 6.56 0 0 1-1.007-3.505c0-3.626 2.957-6.584 6.591-6.584a6.56 6.56 0 0 1 4.66 1.931 6.56 6.56 0 0 1 1.928 4.66c-.004 3.639-2.961 6.592-6.592 6.592m3.615-4.934c-.197-.099-1.17-.578-1.353-.646-.182-.065-.315-.099-.445.099-.133.197-.513.646-.627.775-.114.133-.232.148-.43.05-.197-.1-.836-.308-1.592-.985-.59-.525-.985-1.175-1.103-1.372-.114-.198-.011-.304.088-.403.087-.088.197-.232.296-.346.1-.114.133-.198.198-.33.065-.134.034-.248-.015-.347-.05-.099-.445-1.076-.612-1.47-.16-.389-.323-.335-.445-.34-.114-.007-.247-.007-.38-.007a.73.73 0 0 0-.529.247c-.182.198-.691.677-.691 1.654s.71 1.916.81 2.049c.098.133 1.394 2.132 3.383 2.992.47.205.84.326 1.129.418.475.152.904.129 1.246.08.38-.058 1.171-.48 1.338-.943.164-.464.164-.86.114-.943-.049-.084-.182-.133-.38-.232"/></svg>
@@ -130,15 +126,17 @@ onUnmounted(() => {
 
     <!-- RESEARCH ADMINISTRATORS -->
     <section class="py-5 bg-white">
-        <div class="container py-4 text-center">
-            <h2 class="fw-bold text-navy mb-5">Research Administrators & Co-participants</h2>
+        <div class="container py-5 text-center">
+            <h6 class="text-gold fw-bold ls-2 mb-2 text-uppercase">The People Behind The Project</h6>
+            <h2 class="fw-bold text-navy mb-5 display-6">Our Research Team</h2>
             
             <div class="row g-4 justify-content-center">
-                <div class="col-md-6 col-lg-3" v-for="member in store.content.team" :key="member.name">
-                    <div class="card h-100 border-0 text-center team-card pt-4 pb-3 px-3">
-                        <img :src="`https://ui-avatars.com/api/?name=${encodeURIComponent(member.name)}&background=1b2c57&color=fff&size=128`" class="rounded-circle mx-auto mb-3 shadow" style="width:100px; height:100px" alt="Avatar">
-                        <h5 class="fw-bold text-navy">{{ member.name }}</h5>
-                        <p class="text-gold small fw-bold mb-0">{{ member.role }}</p>
+                <div class="col-md-6 col-lg-4" v-for="member in store.content.team" :key="member.name">
+                    <div class="card h-100 border-0 shadow-sm text-center team-card p-4">
+                        <img :src="member.imageUrl || `https://ui-avatars.com/api/?name=${encodeURIComponent(member.name)}&background=1b2c57&color=fff&size=128`" class="rounded-circle mx-auto mb-3 shadow" style="width:120px; height:120px; object-fit: cover;" alt="Avatar">
+                        <h5 class="fw-bold text-navy mb-1">{{ member.name }}</h5>
+                        <p class="text-gold small fw-bold mb-3 text-uppercase">{{ member.role }}</p>
+                        <p class="text-muted small px-2">{{ member.description }}</p>
                     </div>
                 </div>
             </div>

@@ -86,10 +86,10 @@ const submitForm = async () => {
                 <div class="col-lg-6 pe-lg-5">
                     <h2 class="fw-bold text-navy mb-4">Get in touch</h2>
                     <p class="fw-bold fst-italic text-navy small text-uppercase mb-4" style="letter-spacing: 0.5px; line-height: 1.6;">
-                        We ensure strategic clarity, robust governance, and sustainable impact for institutions across East Africa.
+                        Engage with our research team to discuss AI readiness and labor market integration.
                     </p>
                     <p class="text-muted small mb-5 lh-lg">
-                        The AI Readiness Project provides insights into the rapidly evolving job market. Whether it's rigorous research, system audits, or strategy formulation, our team is ready to partner with you to deliver measurable value.
+                        The AI Readiness Project is actively gathering insights into the rapidly evolving job market. Whether you are an educational institution looking to understand curriculum impacts, a student navigating the job market, or a policymaker interested in scalable interventions, our team is ready to connect with you.
                     </p>
                     
                     <div class="d-flex gap-3 justify-content-center justify-content-lg-start">
@@ -158,12 +158,12 @@ const submitForm = async () => {
                 </div>
 
                 <div class="col-lg-4 col-md-6">
-                    <a href="tel:+254790583820" class="contact-card d-block text-decoration-none shadow-lg">
+                    <a :href="`tel:${store.content.phoneNumber}`" class="contact-card d-block text-decoration-none shadow-lg">
                         <div class="icon-wrap text-gold mb-3">
                             <svg xmlns="http://www.w3.org/2000/svg" width="40" height="40" fill="currentColor" viewBox="0 0 16 16"><path fill-rule="evenodd" d="M1.885.511a1.745 1.745 0 0 1 2.61.163L6.29 2.98c.329.423.445.974.315 1.494l-.547 2.19a.678.678 0 0 0 .178.643l2.457 2.457a.678.678 0 0 0 .644.178l2.189-.547a1.745 1.745 0 0 1 1.494.315l2.306 1.794c.829.645.905 1.87.163 2.611l-1.034 1.034c-.74.74-1.846 1.065-2.877.702a18.634 18.634 0 0 1-7.01-4.42 18.634 18.634 0 0 1-4.42-7.009c-.362-1.03-.037-2.137.703-2.877L1.885.511z"/></svg>
                         </div>
                         <h6 class="fw-bold text-navy text-uppercase ls-1 mb-2">Phone Number</h6>
-                        <p class="text-muted small mb-0">+254-790-583-820</p>
+                        <p class="text-muted small mb-0">{{ store.content.phoneNumber }}</p>
                         <p class="text-muted small mb-0">(Direct Line)</p>
                     </a>
                 </div>

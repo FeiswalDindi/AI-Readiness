@@ -175,20 +175,21 @@ const generateReport = () => {
               Project & Survey Settings
           </h5>
           <div class="row g-4">
-              <div class="col-md-4">
+              <div class="col-md-3">
                   <label class="form-label small fw-bold text-muted text-uppercase ls-1">Main Survey Date</label>
                   <input type="datetime-local" v-model="draftContent.countdownDate" class="form-control bg-light border-0 py-3">
-                  <small class="text-muted d-block mt-2">Sets the countdown timer on the landing page.</small>
               </div>
-              <div class="col-md-4">
+              <div class="col-md-3">
                   <label class="form-label small fw-bold text-muted text-uppercase ls-1">Poster Image URL</label>
                   <input type="url" v-model="draftContent.posterUrl" class="form-control bg-light border-0 py-3" placeholder="https://example.com/poster.jpg">
-                  <small class="text-muted d-block mt-2">Leave blank to show the placeholder.</small>
               </div>
-              <div class="col-md-4">
+              <div class="col-md-3">
                   <label class="form-label small fw-bold text-muted text-uppercase ls-1">Project Logo URL</label>
                   <input type="url" v-model="draftContent.logoUrl" class="form-control bg-light border-0 py-3" placeholder="https://example.com/logo.jpg">
-                  <small class="text-muted d-block mt-2">Navbar logo image link.</small>
+              </div>
+              <div class="col-md-3">
+                  <label class="form-label small fw-bold text-muted text-uppercase ls-1">Phone Number</label>
+                  <input type="text" v-model="draftContent.phoneNumber" class="form-control bg-light border-0 py-3" placeholder="+254700000000">
               </div>
           </div>
       </div>
@@ -201,6 +202,40 @@ const generateReport = () => {
           </div>
           <div class="col-12">
               <AdminSocialsEditor :socials="draftContent.socialUpdates" />
+          </div>
+      </div>
+
+      <!-- MISSION & VISION SETTINGS -->
+      <div class="card border-0 shadow-sm p-4 bg-white mb-5 rounded-4">
+          <h5 class="fw-bold text-navy mb-4 d-flex align-items-center gap-2">Mission & Vision</h5>
+          <div class="row g-4">
+              <div class="col-md-6">
+                  <label class="form-label small fw-bold text-muted text-uppercase ls-1">Mission Statement</label>
+                  <textarea v-model="draftContent.mission" class="form-control bg-light border-0 py-3" rows="4"></textarea>
+              </div>
+              <div class="col-md-6">
+                  <label class="form-label small fw-bold text-muted text-uppercase ls-1">Vision Statement</label>
+                  <textarea v-model="draftContent.vision" class="form-control bg-light border-0 py-3" rows="4"></textarea>
+              </div>
+          </div>
+      </div>
+
+      <!-- TEAM SETTINGS -->
+      <div class="card border-0 shadow-sm p-4 bg-white mb-5 rounded-4">
+          <div class="d-flex justify-content-between align-items-center mb-4">
+            <h5 class="fw-bold text-navy mb-0">Team Members</h5>
+            <button @click="draftContent.team.push({ name: 'New Member', role: 'Role', location: 'Location', description: '', imageUrl: '' })" class="btn btn-sm btn-navy rounded-pill px-3 fw-bold">+ Add Member</button>
+          </div>
+          <div class="row g-4">
+              <div v-for="(member, idx) in draftContent.team" :key="idx" class="col-md-6">
+                  <div class="p-4 bg-light border rounded-4 position-relative">
+                      <button @click="draftContent.team.splice(idx, 1)" class="btn btn-sm btn-danger position-absolute top-0 end-0 m-2 rounded-circle fw-bold" style="width:28px;height:28px;padding:0;">&times;</button>
+                      <input type="text" v-model="member.name" class="form-control mb-2 fw-bold" placeholder="Name">
+                      <input type="text" v-model="member.role" class="form-control mb-2" placeholder="Role">
+                      <input type="url" v-model="member.imageUrl" class="form-control mb-2" placeholder="Image URL">
+                      <textarea v-model="member.description" class="form-control" rows="2" placeholder="Description"></textarea>
+                  </div>
+              </div>
           </div>
       </div>
 
