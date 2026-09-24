@@ -288,7 +288,12 @@ export const store = reactive({
       }, 100);
 
       try {
-          await uploadBytes(fileRef, file);
+          const uploadPromise = uploadBytes(fileRef, file);
+          const timeoutPromise = new Promise((_, reject) => {
+              setTimeout(() => reject(new Error("Upload timed out.")), 10000);
+          });
+          
+          await Promise.race([uploadPromise, timeoutPromise]);
           clearInterval(interval);
           if (onProgress) onProgress(100);
           
@@ -296,7 +301,47 @@ export const store = reactive({
           return url;
       } catch (error) {
           clearInterval(interval);
-          throw error;
+          console.warn("Firebase Storage failed. Falling back to compressed Base64.", error);
+          
+          // FALLBACK: Compress image and convert to Base64
+          return new Promise((resolve, reject) => {
+              const reader = new FileReader();
+              reader.readAsDataURL(file);
+              reader.onload = event => {
+                  const img = new Image();
+                  img.src = event.target.result;
+                  img.onload = () => {
+                      const canvas = document.createElement('canvas');
+                      const MAX_WIDTH = 800;
+                      const MAX_HEIGHT = 800;
+                      let width = img.width;
+                      let height = img.height;
+
+                      if (width > height) {
+                          if (width > MAX_WIDTH) {
+                              height *= MAX_WIDTH / width;
+                              width = MAX_WIDTH;
+                          }
+                      } else {
+                          if (height > MAX_HEIGHT) {
+                              width *= MAX_HEIGHT / height;
+                              height = MAX_HEIGHT;
+                          }
+                      }
+                      canvas.width = width;
+                      canvas.height = height;
+                      const ctx = canvas.getContext('2d');
+                      ctx.drawImage(img, 0, 0, width, height);
+                      
+                      // Compress to JPEG with 0.7 quality
+                      const dataUrl = canvas.toDataURL('image/jpeg', 0.7);
+                      if (onProgress) onProgress(100);
+                      resolve(dataUrl);
+                  };
+                  img.onerror = () => reject(new Error("Base64 Fallback failed."));
+              };
+              reader.onerror = () => reject(new Error("File read failed."));
+          });
       }
   },
 
