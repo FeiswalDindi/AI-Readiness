@@ -60,6 +60,8 @@ watch(() => store.isDataReady, (ready) => {
         if (!draftContent.value.socialUpdates) draftContent.value.socialUpdates = [];
         if (!draftContent.value.about) draftContent.value.about = { title: '', text: '' };
         if (!draftContent.value.team) draftContent.value.team = [];
+        if (!draftContent.value.pageBackgrounds) draftContent.value.pageBackgrounds = { insights: '', contact: '', careers: '', partners: '', services: '', about: '' };
+        if (!draftContent.value.policies) draftContent.value.policies = 'By creating an account, you consent to participate in the AI Readiness in Education research study.\n\nEmail Usage: Your email address will be securely stored in our database. We will use it exclusively to notify you when the Main AI Readiness Assessment survey is available.\n\nData Privacy: All data collected is strictly confidential and will only be used for research purposes. We will not share your personal information with third parties.';
     }
 }, { immediate: true });
 

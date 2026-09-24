@@ -12,7 +12,7 @@ import {
 
 const USER_KEY = 'ra_user_session'; 
 const CONTENT_KEY = 'ra_site_content';
-const APP_VERSION = 'v2.9'; 
+const APP_VERSION = 'v2.10'; 
 
 // --- HELPERS ---
 const loadUser = () => {
