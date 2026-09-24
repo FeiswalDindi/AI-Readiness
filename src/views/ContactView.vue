@@ -66,7 +66,7 @@ const submitForm = async () => {
             <div class="row align-items-center justify-content-center pt-4">
                 
                 <div class="col-12 col-md-5 d-flex justify-content-center text-center mb-5 mb-md-0">
-                    <img :src="store.content.posterUrl || 'https://images.unsplash.com/photo-1573164713988-8665fc963095?w=500&auto=format&fit=crop'" alt="Research Project Logo" class="hero-logo">
+                    <img :src="store.content.logoUrl || 'https://images.unsplash.com/photo-1573164713988-8665fc963095?w=500&auto=format&fit=crop'" alt="Research Project Logo" class="hero-logo">
                 </div>
 
                 <div class="col-12 col-md-7 text-center text-md-start pe-md-5">
