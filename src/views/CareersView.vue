@@ -65,7 +65,10 @@ const submitApplication = async (event) => {
 <template>
   <main class="careers-page bg-light pb-5 min-vh-100">
     
-    <section class="py-5 bg-navy text-white text-center" style="padding-top: 120px !important;">
+    <section class="py-5 bg-navy text-white text-center position-relative" 
+             style="padding-top: 120px !important;"
+             :style="store.content.pageBackgrounds?.careers ? `background-image: linear-gradient(rgba(27, 44, 87, 0.85), rgba(27, 44, 87, 0.95)), url(${store.content.pageBackgrounds.careers}); background-size: cover; background-position: center;` : ''"
+    >
       <div class="container py-5 mt-4">
         <h1 class="display-3 fw-bold mb-3">Get Involved</h1>
         <p class="lead text-white-50 mx-auto" style="max-width: 700px;">

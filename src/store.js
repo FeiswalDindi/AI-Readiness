@@ -62,7 +62,16 @@ export const store = reactive({
     countdownDate: '2026-12-01T10:00:00',
     posterUrl: '',
     logoUrl: '',
+    pageBackgrounds: {
+        insights: '',
+        contact: '',
+        careers: '',
+        partners: '',
+        services: '',
+        about: ''
+    },
     phoneNumber: '+254768980297',
+    policies: 'By creating an account, you consent to participate in the AI Readiness in Education research study.\n\nEmail Usage: Your email address will be securely stored in our database. We will use it exclusively to notify you when the Main AI Readiness Assessment survey is available.\n\nData Privacy: All data collected is strictly confidential and will only be used for research purposes. We will not share your personal information with third parties.',
     mission: 'To spearhead data-driven research that explores how generative AI impacts higher education and graduate employability across East Africa.',
     vision: 'To provide universities and policymakers with actionable, evidence-based insights that bridge the gap between academic curricula and the evolving demands of an AI-driven labor market.',
     whatsappLink: 'https://chat.whatsapp.com/FDJbRo6Uhhe1nAeMQqiSbU',
@@ -129,7 +138,7 @@ export const store = reactive({
       const docRef = doc(db, "global_content", "main_data");
       onSnapshot(docRef, (snap) => {
           if (snap.exists()) {
-              this.content = { ...this.content, ...snap.data() };
+              Object.assign(this.content, snap.data());
               localStorage.setItem(CONTENT_KEY, JSON.stringify({ version: APP_VERSION, data: this.content }));
           } else {
               // First time setup, save default content to DB

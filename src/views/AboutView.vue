@@ -16,7 +16,10 @@ const closeMemberModal = () => {
 <template>
   <main class="about-page bg-light min-vh-100">
     
-    <section class="page-header py-5 bg-navy text-white text-center" style="padding-top: 120px !important;">
+    <section class="page-header py-5 bg-navy text-white text-center" 
+             style="padding-top: 120px !important;"
+             :style="store.content.pageBackgrounds?.about ? `background-image: linear-gradient(rgba(27, 44, 87, 0.85), rgba(27, 44, 87, 0.95)), url(${store.content.pageBackgrounds.about}); background-size: cover; background-position: center;` : ''"
+    >
       <div class="container py-5 mt-4">
         <h1 class="display-3 fw-bold mb-3">About The Research</h1>
         <p class="lead text-white-50 mx-auto" style="max-width: 800px;">

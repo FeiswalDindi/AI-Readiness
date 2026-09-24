@@ -22,6 +22,9 @@ const isLoading = ref(false);
 const showPassword = ref(false);
 const showConfirmPassword = ref(false);
 
+const agreePolicies = ref(false);
+const showPolicyModal = ref(false);
+
 const handleRedirect = async () => {
     store.closeModal();
     if (store.intent === 'survey') {
@@ -54,6 +57,12 @@ const handleSubmit = async () => {
         } else {
             // --- SIGN UP LOGIC ---
             
+            if (!agreePolicies.value) {
+                errorMessage.value = "You must agree to the privacy and consent policies to sign up.";
+                isLoading.value = false;
+                return;
+            }
+
             // 1. Basic Validation
             if (!name.value) {
                 errorMessage.value = "Please enter your full name.";
@@ -88,7 +97,18 @@ const handleSubmit = async () => {
     }
 };
 
+const pendingGoogleLogin = ref(false);
+
 const handleGoogle = async () => {
+    if (!agreePolicies.value) {
+        pendingGoogleLogin.value = true;
+        showPolicyModal.value = true;
+        return;
+    }
+    await executeGoogleLogin();
+};
+
+const executeGoogleLogin = async () => {
   try {
     const result = await signInWithPopup(auth, googleProvider);
     await store.googleLogin(result.user);
@@ -96,6 +116,15 @@ const handleGoogle = async () => {
   } catch (error) {
     errorMessage.value = `Google sign-in failed: ${error.message}`;
   }
+};
+
+const acceptPolicies = () => {
+    agreePolicies.value = true;
+    showPolicyModal.value = false;
+    if (pendingGoogleLogin.value) {
+        pendingGoogleLogin.value = false;
+        executeGoogleLogin();
+    }
 };
 
 // Reset fields when switching modes
@@ -176,6 +205,13 @@ const toggleMode = () => {
             </span>
         </div>
         
+        <div v-if="!isLogin" class="form-check text-start mb-3 fade-in">
+            <input class="form-check-input" type="checkbox" v-model="agreePolicies" id="agreePolicies">
+            <label class="form-check-label small text-white-50" for="agreePolicies">
+                I agree to the <span class="text-gold fw-bold text-decoration-underline" style="cursor:pointer;" @click.prevent="showPolicyModal = true">policies</span>.
+            </label>
+        </div>
+        
         <div v-if="errorMessage" class="error-msg d-flex align-items-center gap-2 mb-3">
             <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" viewBox="0 0 16 16"><path d="M8.982 1.566a1.13 1.13 0 0 0-1.96 0L.165 13.233c-.457.778.091 1.767.98 1.767h13.713c.889 0 1.438-.99.98-1.767L8.982 1.566zM8 5c.535 0 .954.462.9.995l-.35 3.507a.552.552 0 0 1-1.1 0L7.1 5.995A.905.905 0 0 1 8 5zm.002 6a1 1 0 1 1 0 2 1 1 0 0 1 0-2z"/></svg>
             <span>{{ errorMessage }}</span>
@@ -192,6 +228,24 @@ const toggleMode = () => {
         <span @click="toggleMode" class="text-white fw-bold pointer">{{ isLogin ? 'Sign up' : 'Log in' }}</span>
       </p>
     </div>
+
+    <!-- POLICY MODAL -->
+    <transition name="fade">
+        <div v-if="showPolicyModal" class="modal-overlay d-flex justify-content-center align-items-center" style="z-index: 10001;" @click.self="showPolicyModal = false">
+            <div class="bg-white p-4 rounded-0 shadow-lg text-dark" style="max-width: 500px;">
+                <div class="d-flex justify-content-between align-items-center mb-3 border-bottom pb-2">
+                    <h5 class="fw-bold mb-0 text-navy">Privacy & Consent Policy</h5>
+                    <button class="btn-close" @click="showPolicyModal = false"></button>
+                </div>
+                <div class="small text-muted mb-4" style="line-height: 1.6; white-space: pre-wrap; max-height: 300px; overflow-y: auto; text-align: left;">
+                    {{ store.content.policies }}
+                </div>
+                <div class="d-flex gap-2 justify-content-end">
+                    <button class="btn btn-navy rounded-0 px-4 py-2 fw-bold text-white" @click="acceptPolicies">I Agree</button>
+                </div>
+            </div>
+        </div>
+    </transition>
   </div>
 </template>
 

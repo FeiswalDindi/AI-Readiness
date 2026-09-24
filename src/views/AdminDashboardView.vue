@@ -33,6 +33,9 @@ const handleImageUpload = async (event, fieldName, isTeamMember = false, teamInd
         });
         if (isTeamMember) {
             draftContent.value.team[teamIndex][fieldName] = url;
+        } else if (fieldName.includes('.')) {
+            const [parent, child] = fieldName.split('.');
+            draftContent.value[parent][child] = url;
         } else {
             draftContent.value[fieldName] = url;
         }
@@ -318,6 +321,38 @@ const generateReport = () => {
           </div>
       </div>
 
+      <!-- PAGE BACKGROUNDS -->
+      <div class="card border-0 shadow-sm p-4 bg-white mb-5 rounded-4 position-relative">
+          <div class="d-flex justify-content-between align-items-center mb-4">
+              <h5 class="fw-bold text-navy mb-0 d-flex align-items-center gap-2">
+                  <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" fill="currentColor" class="text-gold" viewBox="0 0 16 16"><path d="M4.502 9a1.5 1.5 0 1 0 0-3 1.5 1.5 0 0 0 0 3z"/><path d="M14.002 13a2 2 0 0 1-2 2h-10a2 2 0 0 1-2-2V5A2 2 0 0 1 2 3a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2v8a2 2 0 0 1-2 2zM14 2H4a1 1 0 0 0-1 1h9.002a2 2 0 0 1 2 2v7A1 1 0 0 0 15 11V3a1 1 0 0 0-1-1zM2.002 4a1 1 0 0 0-1 1v8l2.646-2.354a.5.5 0 0 1 .63-.062l2.66 1.773 3.71-3.71a.5.5 0 0 1 .577-.094l1.777 1.947V5a1 1 0 0 0-1-1h-10z"/></svg>
+                  Global Page Backgrounds
+              </h5>
+              <transition name="fade">
+                  <button v-if="isSectionDirty(['pageBackgrounds'])" @click="saveSection(['pageBackgrounds'])" class="btn btn-sm btn-success fw-bold px-3 rounded-pill">Save Backgrounds</button>
+              </transition>
+          </div>
+          <div class="row g-4" v-if="draftContent.pageBackgrounds">
+              <div class="col-md-4" v-for="(bgLabel, bgKey) in { insights: 'Insights', contact: 'Contact Us', careers: 'Careers', partners: 'Partners', services: 'Services', about: 'About Us' }" :key="bgKey">
+                  <label class="form-label small fw-bold text-muted text-uppercase ls-1">{{ bgLabel }} Hero Image</label>
+                  <div class="d-flex gap-2">
+                      <div v-if="draftContent.pageBackgrounds[bgKey]" class="border rounded shadow-sm overflow-hidden flex-shrink-0" style="width: 48px; height: 48px;">
+                          <img :src="draftContent.pageBackgrounds[bgKey]" class="w-100 h-100 object-fit-cover" alt="Preview">
+                      </div>
+                      <div class="input-group">
+                          <input type="url" v-model="draftContent.pageBackgrounds[bgKey]" class="form-control bg-light border-0 py-3" placeholder="Image URL">
+                          <input type="file" @change="e => handleImageUpload(e, 'pageBackgrounds.'+bgKey)" class="d-none" :id="'bgUpload_'+bgKey" accept="image/*">
+                          <label :for="'bgUpload_'+bgKey" class="input-group-text bg-white cursor-pointer fw-bold px-3 position-relative overflow-hidden">
+                              <div v-if="uploadingState['pageBackgrounds.'+bgKey]" class="position-absolute top-0 start-0 h-100 bg-success opacity-25" :style="{ width: uploadProgress['pageBackgrounds.'+bgKey] + '%' }"></div>
+                              <span v-if="uploadingState['pageBackgrounds.'+bgKey]" class="position-relative z-2 small">{{ uploadProgress['pageBackgrounds.'+bgKey] }}%</span>
+                              <span v-else>Upload</span>
+                          </label>
+                      </div>
+                  </div>
+              </div>
+          </div>
+      </div>
+
       <div class="position-relative mb-5">
           <div class="d-flex justify-content-end mb-2">
               <transition name="fade">
@@ -373,6 +408,23 @@ const generateReport = () => {
               </div>
           </div>
       </div>
+
+      <!-- POLICY SETTINGS -->
+      <div class="card border-0 shadow-sm p-4 bg-white mb-5 rounded-4">
+          <div class="d-flex justify-content-between align-items-center mb-4">
+              <h5 class="fw-bold text-navy mb-0 d-flex align-items-center gap-2">Privacy & Consent Policy</h5>
+              <transition name="fade">
+                  <button v-if="isSectionDirty(['policies'])" @click="saveSection(['policies'])" class="btn btn-sm btn-success fw-bold px-3 rounded-pill">Save Policy</button>
+              </transition>
+          </div>
+          <div class="row">
+              <div class="col-12">
+                  <label class="form-label small fw-bold text-muted text-uppercase ls-1">Consent Policy Text</label>
+                  <textarea v-model="draftContent.policies" class="form-control bg-light border-0 py-3" rows="6" placeholder="Enter policy text here."></textarea>
+              </div>
+          </div>
+      </div>
+
 
       <!-- TEAM SETTINGS -->
       <div class="card border-0 shadow-sm p-4 bg-white mb-5 rounded-4">

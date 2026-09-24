@@ -84,7 +84,10 @@ const handleImageError = (e) => {
 <template>
   <main class="insights-page bg-light min-vh-100 pb-5">
     
-    <section class="page-header py-5 bg-navy text-white text-center position-relative overflow-hidden" style="padding-top: 120px !important;">
+    <section class="page-header py-5 bg-navy text-white text-center position-relative overflow-hidden" 
+             style="padding-top: 120px !important;"
+             :style="store.content.pageBackgrounds?.insights ? `background-image: linear-gradient(rgba(27, 44, 87, 0.85), rgba(27, 44, 87, 0.95)), url(${store.content.pageBackgrounds.insights}); background-size: cover; background-position: center;` : ''"
+    >
       <div class="container py-5 position-relative z-2 mt-4">
         
         <div class="header-logo mx-auto mb-4" v-scroll-reveal>

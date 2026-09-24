@@ -59,7 +59,9 @@ const submitForm = async () => {
 <template>
   <main class="contact-page-wrapper">
     
-    <section class="top-section bg-navy text-white position-relative pb-5">
+    <section class="top-section bg-navy text-white position-relative pb-5"
+             :style="store.content.pageBackgrounds?.contact ? `background-image: linear-gradient(rgba(27, 44, 87, 0.85), rgba(27, 44, 87, 0.95)), url(${store.content.pageBackgrounds.contact}); background-size: cover; background-position: center;` : ''"
+    >
         <div class="container pt-5">
             <div class="row align-items-center justify-content-center pt-4">
                 
