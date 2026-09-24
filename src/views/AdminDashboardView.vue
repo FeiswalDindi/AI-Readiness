@@ -50,19 +50,15 @@ const showReportModal = ref(false);
 const reportType = ref('daily');
 const reportDate = ref(new Date().toISOString().slice(0, 10));
 
-watch(() => store.content, (newVal) => {
-    if (newVal) {
-        const currentDraft = JSON.stringify(draftContent.value);
-        const currentStore = JSON.stringify(newVal);
-        if (currentDraft.length < 200 && currentStore.length > 200) {
-            draftContent.value = JSON.parse(currentStore);
-        }
+watch(() => store.isDataReady, (ready) => {
+    if (ready) {
+        draftContent.value = JSON.parse(JSON.stringify(store.content));
         if (!draftContent.value.heroSlides) draftContent.value.heroSlides = [];
         if (!draftContent.value.socialUpdates) draftContent.value.socialUpdates = [];
         if (!draftContent.value.about) draftContent.value.about = { title: '', text: '' };
         if (!draftContent.value.team) draftContent.value.team = [];
     }
-}, { deep: true, immediate: true });
+}, { immediate: true });
 
 // --- SMART SAVE LOGIC ---
 const isDirty = computed(() => JSON.stringify(draftContent.value) !== JSON.stringify(store.content));

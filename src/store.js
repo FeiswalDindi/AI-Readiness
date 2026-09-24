@@ -42,6 +42,7 @@ export const store = reactive({
   
   activityLogs: [],
   isLoadingLogs: true,
+  isDataReady: false,
 
   content: loadContent() || {
     heroSlides: [], 
@@ -126,6 +127,7 @@ export const store = reactive({
               // First time setup, save default content to DB
               this.saveContent();
           }
+          this.isDataReady = true;
       });
   },
 
