@@ -163,26 +163,12 @@ onUnmounted(() => {
     <!-- MISSION / VISION -->
     <section class="py-5 bg-white">
         <div class="container py-4">
-            <div class="mission-vision-container shadow-lg" v-scroll-reveal="{ delay: 100 }">
-                <div class="row g-0 h-100 position-relative z-2">
-                    
-                    <!-- VISION (Left, Orange side) -->
-                    <div class="col-md-6 p-5 d-flex flex-column text-white position-relative" style="min-height: 350px;">
-                        <div class="mb-4 text-start">
-                            <h2 class="fw-bold display-5 text-uppercase mb-3" style="line-height: 1.1; letter-spacing: -1px;">Our<br>Vision</h2>
-                            <p class="fs-6 opacity-75 pe-md-4" style="line-height: 1.6;">{{ store.content.vision }}</p>
-                        </div>
-                        <div class="mt-auto pt-4 text-start">
-                            <svg xmlns="http://www.w3.org/2000/svg" width="60" height="60" fill="currentColor" viewBox="0 0 16 16">
-                                <path d="M10.5 8a2.5 2.5 0 1 1-5 0 2.5 2.5 0 0 1 5 0z"/>
-                                <path d="M0 8s3-5.5 8-5.5S16 8 16 8s-3 5.5-8 5.5S0 8 0 8zm8 3.5a3.5 3.5 0 1 0 0-7 3.5 3.5 0 0 0 0 7z"/>
-                            </svg>
-                        </div>
-                    </div>
-
-                    <!-- MISSION (Right, Light gray side) -->
-                    <div class="col-md-6 p-5 d-flex flex-column text-navy position-relative" style="min-height: 350px;">
-                        <div class="text-end mb-4">
+            <div class="mission-vision-wrapper" v-scroll-reveal="{ delay: 100 }">
+                
+                <!-- Right Shape (Mission) - Base Layer -->
+                <div class="shape-right d-flex position-absolute top-0 start-0 w-100 h-100">
+                    <div class="w-50 ms-auto p-5 d-flex flex-column text-navy justify-content-between align-items-end h-100">
+                        <div class="mb-4 text-end">
                             <svg xmlns="http://www.w3.org/2000/svg" width="60" height="60" fill="#1b2c57" viewBox="0 0 16 16">
                                 <path d="M8 15A7 7 0 1 1 8 1a7 7 0 0 1 0 14zm0 1A8 8 0 1 0 8 0a8 8 0 0 0 0 16z"/>
                                 <path d="M8 13A5 5 0 1 1 8 3a5 5 0 0 1 0 10zm0 1A6 6 0 1 0 8 2a6 6 0 0 0 0 12z"/>
@@ -193,13 +179,29 @@ onUnmounted(() => {
                                 <path d="M14.5 2.5a.5.5 0 0 1 .5.5v3a.5.5 0 0 1-1 0V3.707L11.854 5.854a.5.5 0 0 1-.708-.708L13.293 3H11.5a.5.5 0 0 1 0-1h3z"/>
                             </svg>
                         </div>
-                        <div class="mt-auto text-end">
+                        <div class="mt-auto text-end" style="max-width: 85%;">
                             <h2 class="fw-bold display-5 text-uppercase mb-3" style="line-height: 1.1; letter-spacing: -1px; color: #1b2c57;">Our<br>Mission</h2>
-                            <p class="fs-6 text-muted ms-auto" style="line-height: 1.6; max-width: 90%;">{{ store.content.mission }}</p>
+                            <p class="fs-6 text-muted" style="line-height: 1.6;">{{ store.content.mission }}</p>
                         </div>
                     </div>
-
                 </div>
+
+                <!-- Left Shape (Vision) - Top Layer -->
+                <div class="shape-left d-flex position-relative w-100 h-100">
+                    <div class="w-50 p-5 d-flex flex-column text-white justify-content-between h-100">
+                        <div class="mb-4 text-start">
+                            <h2 class="fw-bold display-5 text-uppercase mb-3" style="line-height: 1.1; letter-spacing: -1px;">Our<br>Vision</h2>
+                            <p class="fs-6 opacity-75" style="line-height: 1.6;">{{ store.content.vision }}</p>
+                        </div>
+                        <div class="mt-auto text-start">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="60" height="60" fill="currentColor" viewBox="0 0 16 16">
+                                <path d="M10.5 8a2.5 2.5 0 1 1-5 0 2.5 2.5 0 0 1 5 0z"/>
+                                <path d="M0 8s3-5.5 8-5.5S16 8 16 8s-3 5.5-8 5.5S0 8 0 8zm8 3.5a3.5 3.5 0 1 0 0-7 3.5 3.5 0 0 0 0 7z"/>
+                            </svg>
+                        </div>
+                    </div>
+                </div>
+
             </div>
         </div>
     </section>
@@ -392,26 +394,43 @@ onUnmounted(() => {
 
 .platform-icon-wrap svg { filter: drop-shadow(0 2px 4px rgba(0,0,0,0.1)); }
 
-.mission-vision-container {
+.mission-vision-wrapper {
     position: relative;
-    background: #f4f6fa;
+    width: 100%;
+    min-height: 450px;
+    background: transparent;
     border-radius: 30px;
-    overflow: hidden;
-}
-.mission-vision-container::before {
-    content: '';
-    position: absolute;
-    top: 0; left: 0;
-    width: 100%; height: 100%;
-    background: linear-gradient(160deg, #f1c40f 0%, #e67e22 50%, #d35400 100%);
-    clip-path: polygon(0 0, 70% 0, 35% 100%, 0% 100%);
-    z-index: 1;
 }
 
+.shape-left {
+    background: linear-gradient(135deg, #dfc445 0%, #bea429 100%);
+    border-bottom-left-radius: 60px;
+    clip-path: polygon(0 0, 64% 0, 34% 100%, 0 100%);
+    z-index: 2;
+    transition: transform 0.3s ease;
+}
+
+.shape-right {
+    background: #f4f6fa;
+    border-top-right-radius: 60px;
+    clip-path: polygon(66% 0, 100% 0, 100% 100%, 36% 100%);
+    z-index: 1;
+    transition: transform 0.3s ease;
+}
+
+.mission-vision-wrapper:hover .shape-left { transform: translateY(-5px); }
+.mission-vision-wrapper:hover .shape-right { transform: translateY(-5px); }
+
 @media (max-width: 768px) {
-    .mission-vision-container::before {
-        clip-path: polygon(0 0, 100% 0, 100% 50%, 0% 100%);
+    .shape-left {
+        clip-path: polygon(0 0, 100% 0, 100% 50%, 0 45%);
+        width: 100% !important;
     }
+    .shape-right {
+        clip-path: polygon(100% 52%, 100% 100%, 0 100%, 0 47%);
+        width: 100% !important;
+    }
+    .shape-left .w-50, .shape-right .w-50 { width: 100% !important; padding: 2rem !important; }
 }
 
 .team-card { transition: all 0.3s ease; border: 1px solid transparent !important; }
