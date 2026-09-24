@@ -271,6 +271,9 @@ onMounted(() => {
 .bg-white-10 { background-color: rgba(255,255,255,0.05); }
 
 /* BUTTONS */
+.btn-gold { background-color: #bea429; color: #1b2c57 !important; border: none; transition: all 0.3s ease; }
+.btn-gold:hover { background-color: #a38c22; transform: translateY(-3px); color: white !important; }
+
 .btn-navy-outline { border: 2px solid #1b2c57 !important; color: #1b2c57 !important; background: transparent; transition: 0.3s; }
 .btn-navy-outline:hover { background: #1b2c57 !important; color: white !important; }
 .btn-outline-navy { border: 2px solid #1b2c57 !important; color: #1b2c57 !important; background: transparent; transition: 0.3s; }
