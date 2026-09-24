@@ -274,25 +274,30 @@ export const store = reactive({
   },
 
   async uploadImage(file, path, onProgress) {
-      const { ref: storageRef, uploadBytesResumable, getDownloadURL } = await import('firebase/storage');
+      const { ref: storageRef, uploadBytes, getDownloadURL } = await import('firebase/storage');
       const { storage } = await import('./firebase');
       
       const fileRef = storageRef(storage, `${path}/${Date.now()}_${file.name}`);
-      const uploadTask = uploadBytesResumable(fileRef, file);
+      
+      // Simulate progress for UI liveliness since uploadBytes doesn't emit progress natively
+      let progress = 0;
+      const interval = setInterval(() => {
+          progress += 15;
+          if (progress > 90) progress = 90; // hold at 90% until done
+          if (onProgress) onProgress(progress);
+      }, 100);
 
-      return new Promise((resolve, reject) => {
-          uploadTask.on('state_changed', 
-              (snapshot) => {
-                  const progress = (snapshot.bytesTransferred / snapshot.totalBytes) * 100;
-                  if (onProgress) onProgress(progress);
-              }, 
-              (error) => reject(error), 
-              async () => {
-                  const url = await getDownloadURL(uploadTask.snapshot.ref);
-                  resolve(url);
-              }
-          );
-      });
+      try {
+          await uploadBytes(fileRef, file);
+          clearInterval(interval);
+          if (onProgress) onProgress(100);
+          
+          const url = await getDownloadURL(fileRef);
+          return url;
+      } catch (error) {
+          clearInterval(interval);
+          throw error;
+      }
   },
 
   addResource(resource) {
