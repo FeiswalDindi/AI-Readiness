@@ -1,5 +1,6 @@
 import { reactive } from 'vue';
-import { db, auth } from './firebase'; 
+import { db, auth, storage } from './firebase';
+import { ref as storageRef, uploadBytesResumable, getDownloadURL } from 'firebase/storage';
 import { 
     doc, setDoc, getDoc, onSnapshot, collection, addDoc, serverTimestamp, query, orderBy, limit 
 } from 'firebase/firestore'; 
@@ -363,65 +364,29 @@ export const store = reactive({
         });
   },
 
-  async uploadImage(file, path, onProgress) {
-      return new Promise((resolve, reject) => {
-          // Simulate a fast progress bar for UI liveliness
-          let progress = 0;
-          const interval = setInterval(() => {
-              progress += 20;
-              if (progress > 90) progress = 90;
-              if (onProgress) onProgress(progress);
-          }, 50);
+  async uploadImage(file, pathStr, onProgress) {
+        return new Promise((resolve, reject) => {
+            const fileName = `${Date.now()}_${file.name.replace(/[^a-zA-Z0-9.]/g, '_')}`;
+            const fullPath = `${pathStr}/${fileName}`;
+            const fileRef = storageRef(storage, fullPath);
+            const uploadTask = uploadBytesResumable(fileRef, file);
 
-          const reader = new FileReader();
-          reader.readAsDataURL(file);
-          reader.onload = event => {
-              const img = new Image();
-              img.src = event.target.result;
-              img.onload = () => {
-                  const canvas = document.createElement('canvas');
-                  const MAX_WIDTH = 700;
-                  const MAX_HEIGHT = 700;
-                  let width = img.width;
-                  let height = img.height;
-
-                  // Maintain aspect ratio while downscaling
-                  if (width > height) {
-                      if (width > MAX_WIDTH) {
-                          height *= MAX_WIDTH / width;
-                          width = MAX_WIDTH;
-                      }
-                  } else {
-                      if (height > MAX_HEIGHT) {
-                          width *= MAX_HEIGHT / height;
-                          height = MAX_HEIGHT;
-                      }
-                  }
-                  canvas.width = width;
-                  canvas.height = height;
-                  
-                  // Draw and compress
-                  const ctx = canvas.getContext('2d');
-                  ctx.drawImage(img, 0, 0, width, height);
-                  const dataUrl = canvas.toDataURL('image/jpeg', 0.5);
-                  
-                  clearInterval(interval);
-                  if (onProgress) onProgress(100);
-                  
-                  // Return the highly compressed string directly to be saved in Firestore Database
-                  resolve(dataUrl);
-              };
-              img.onerror = () => {
-                  clearInterval(interval);
-                  reject(new Error("Image processing failed."));
-              };
-          };
-          reader.onerror = () => {
-              clearInterval(interval);
-              reject(new Error("File read failed."));
-          };
-      });
-  },
+            uploadTask.on(
+                'state_changed',
+                (snapshot) => {
+                    const progress = (snapshot.bytesTransferred / snapshot.totalBytes) * 100;
+                    if (onProgress) onProgress(progress);
+                },
+                (error) => {
+                    reject(error);
+                },
+                async () => {
+                    const downloadURL = await getDownloadURL(uploadTask.snapshot.ref);
+                    resolve(downloadURL);
+                }
+            );
+        });
+    },
 
   addResource(resource) {
       if (!this.content.resources) this.content.resources = [];
