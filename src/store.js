@@ -358,7 +358,7 @@ export const store = reactive({
       localStorage.setItem(CONTENT_KEY, JSON.stringify({ version: APP_VERSION, data: this.content }));
       return setDoc(doc(db, "global_content", "main_data"), JSON.parse(JSON.stringify(this.content)))
         .catch(e => {
-            console.error("Save Error:", e);
+            console.error("Save Error:", e); alert("Failed to save changes! The data might be too large (e.g. images over 1MB). Please try again.");
             throw e;
         });
   },
@@ -380,8 +380,8 @@ export const store = reactive({
               img.src = event.target.result;
               img.onload = () => {
                   const canvas = document.createElement('canvas');
-                  const MAX_WIDTH = 1200;
-                  const MAX_HEIGHT = 1200;
+                  const MAX_WIDTH = 700;
+                  const MAX_HEIGHT = 700;
                   let width = img.width;
                   let height = img.height;
 
@@ -403,7 +403,7 @@ export const store = reactive({
                   // Draw and compress
                   const ctx = canvas.getContext('2d');
                   ctx.drawImage(img, 0, 0, width, height);
-                  const dataUrl = canvas.toDataURL('image/jpeg', 0.8);
+                  const dataUrl = canvas.toDataURL('image/jpeg', 0.5);
                   
                   clearInterval(interval);
                   if (onProgress) onProgress(100);

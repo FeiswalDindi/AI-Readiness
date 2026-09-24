@@ -10,6 +10,20 @@ const selectedMember = ref(null);
 
 const slides = computed(() => store.content.heroSlides || []);
 
+const currentSubtitle = computed(() => {
+    if (slides.value.length > 0 && slides.value[currentSlide.value]) {
+        return slides.value[currentSlide.value].subtitle || store.content.about.text || '';
+    }
+    return store.content.about.text || '';
+});
+
+const isLongSubtitle = computed(() => {
+    const text = currentSubtitle.value;
+    const parts = text.split(/<\/p>|<br\s*\/?>\s*<br\s*\/?>|\n\n/i).filter(p => p.trim().length > 0);
+    return parts.length > 2;
+});
+
+
 const openMemberModal = (member) => {
     selectedMember.value = member;
 };
@@ -89,17 +103,33 @@ onUnmounted(() => {
                             <h1 class="display-4 fw-bold mb-4 animate-title text-white">
                                 {{ slides[currentSlide].title || store.content.about.title }}
                             </h1>
-                            <p class="lead mb-4 opacity-75 fs-5 animate-subtitle pe-lg-4" style="white-space: pre-wrap;">
-                                {{ slides[currentSlide].subtitle || store.content.about.text }}
-                            </p>
+                            <div class="position-relative mb-4 pe-lg-4">
+                                <div class="lead opacity-75 fs-5 animate-subtitle" 
+                                     :style="isLongSubtitle ? 'max-height: 160px; overflow: hidden; white-space: pre-wrap; padding-bottom: 20px;' : 'white-space: pre-wrap;'" 
+                                     v-html="currentSubtitle">
+                                </div>
+                                <div v-if="isLongSubtitle" class="position-absolute bottom-0 start-0 w-100 d-flex align-items-end" style="height: 80px; background: linear-gradient(transparent, rgba(27,44,87, 1) 90%);">
+                                    <router-link to="/about#what-we-are" class="text-gold fw-bold text-decoration-none small text-uppercase mb-1" style="letter-spacing: 1px;">
+                                        View More <i class="bi bi-arrow-right"></i>
+                                    </router-link>
+                                </div>
+                            </div>
                         </div>
                         <div v-else>
                             <h1 class="display-4 fw-bold mb-4 animate-title text-white">
                                 {{ store.content.about.title }}
                             </h1>
-                            <p class="lead mb-4 opacity-75 fs-5 animate-subtitle pe-lg-4" style="white-space: pre-wrap;">
-                                {{ store.content.about.text }}
-                            </p>
+                            <div class="position-relative mb-4 pe-lg-4">
+                                <div class="lead opacity-75 fs-5 animate-subtitle" 
+                                     :style="isLongSubtitle ? 'max-height: 160px; overflow: hidden; white-space: pre-wrap; padding-bottom: 20px;' : 'white-space: pre-wrap;'" 
+                                     v-html="currentSubtitle">
+                                </div>
+                                <div v-if="isLongSubtitle" class="position-absolute bottom-0 start-0 w-100 d-flex align-items-end" style="height: 80px; background: linear-gradient(transparent, rgba(27,44,87, 1) 90%);">
+                                    <router-link to="/about#what-we-are" class="text-gold fw-bold text-decoration-none small text-uppercase mb-1" style="letter-spacing: 1px;">
+                                        View More <i class="bi bi-arrow-right"></i>
+                                    </router-link>
+                                </div>
+                            </div>
                         </div>
                     </transition>
                     
@@ -194,7 +224,7 @@ onUnmounted(() => {
                         </div>
                         <div class="mt-auto text-end" style="max-width: 85%;">
                             <h2 class="fw-bold display-5 text-uppercase mb-3" style="line-height: 1.1; letter-spacing: -1px; color: #1b2c57;">Our<br>Mission</h2>
-                            <p class="fs-6 text-muted" style="line-height: 1.6;">{{ store.content.mission }}</p>
+                            <div class="fs-6 text-muted" style="line-height: 1.6;" v-html="store.content.mission"></div>
                         </div>
                     </div>
                 </div>
@@ -204,7 +234,7 @@ onUnmounted(() => {
                     <div class="w-50 p-5 d-flex flex-column text-white justify-content-between h-100">
                         <div class="mb-4 text-start">
                             <h2 class="fw-bold display-5 text-uppercase mb-3" style="line-height: 1.1; letter-spacing: -1px;">Our<br>Vision</h2>
-                            <p class="fs-6 opacity-75" style="line-height: 1.6;">{{ store.content.vision }}</p>
+                            <div class="fs-6 opacity-75" style="line-height: 1.6;" v-html="store.content.vision"></div>
                         </div>
                         <div class="mt-auto text-start">
                             <svg xmlns="http://www.w3.org/2000/svg" width="60" height="60" fill="currentColor" viewBox="0 0 16 16">
@@ -231,7 +261,7 @@ onUnmounted(() => {
                         class="card h-100 border-0 shadow-sm text-center team-card p-4 cursor-pointer rounded-0"
                         @click="openMemberModal(member)"
                     >
-                        <img :src="member.imageUrl || `https://ui-avatars.com/api/?name=${encodeURIComponent(member.name)}&background=1b2c57&color=fff&size=128`" class="rounded-circle mx-auto mb-3 shadow" style="width:120px; height:120px; object-fit: cover;" alt="Avatar">
+                        <img :src="member.imageUrl || `https://ui-avatars.com/api/?name=${(member.name.includes('Khan Ul') || member.name.includes('Carn Ul')) ? 'U+K' : encodeURIComponent(member.name)}&background=1b2c57&color=fff&size=128`" class="rounded-circle mx-auto mb-3 shadow" style="width:120px; height:120px; object-fit: cover;" alt="Avatar">
                         <h5 class="fw-bold text-navy mb-1">{{ member.name }}</h5>
                         <p class="text-gold small fw-bold mb-3 text-uppercase">{{ member.role }}</p>
                         
@@ -251,13 +281,13 @@ onUnmounted(() => {
                 <button class="close-btn text-navy shadow-sm border rounded-0" @click="closeMemberModal">×</button>
                 
                 <div class="text-center mb-4">
-                    <img :src="selectedMember.imageUrl || `https://ui-avatars.com/api/?name=${encodeURIComponent(selectedMember.name)}&background=1b2c57&color=fff&size=128`" class="rounded-0 shadow-lg mb-3 border border-4 border-white" style="width: 150px; height: 150px; object-fit: cover; margin-top: -80px;">
+                    <img :src="selectedMember.imageUrl || `https://ui-avatars.com/api/?name=${(selectedMember.name.includes('Khan Ul') || selectedMember.name.includes('Carn Ul')) ? 'U+K' : encodeURIComponent(selectedMember.name)}&background=1b2c57&color=fff&size=128`" class="rounded-0 shadow-lg mb-3 border border-4 border-white" style="width: 150px; height: 150px; object-fit: cover; margin-top: -80px;">
                     <h3 class="fw-bold text-navy mb-1">{{ selectedMember.name }}</h3>
                     <h6 class="text-gold fw-bold text-uppercase ls-1 mb-4">{{ selectedMember.role }}</h6>
                     
                     <div class="bg-light-navy p-4 rounded-0 text-start border position-relative overflow-hidden">
                         <svg class="position-absolute" style="top:-20px; right:-20px; opacity: 0.04; pointer-events: none;" xmlns="http://www.w3.org/2000/svg" width="120" height="120" fill="#1b2c57" viewBox="0 0 16 16"><path d="M8 15A7 7 0 1 1 8 1a7 7 0 0 1 0 14m0 1A8 8 0 1 0 8 0a8 8 0 0 0 0 16"/></svg>
-                        <p class="text-muted mb-0 lh-lg position-relative z-2" style="white-space: pre-wrap;">{{ selectedMember.description || "No description provided." }}</p>
+                        <div class="text-muted mb-0 lh-lg position-relative z-2" style="white-space: pre-wrap;" v-html="selectedMember.description || 'No description provided.'"></div>
                     </div>
                 </div>
                 
@@ -302,7 +332,7 @@ onUnmounted(() => {
                                 </div>
                             </div>
                             
-                            <p class="card-text text-dark mb-4 flex-grow-1" style="white-space: pre-wrap; font-size: 0.95rem;">{{ update.text }}</p>
+                            <div class="card-text text-dark mb-4 flex-grow-1" style="white-space: pre-wrap; font-size: 0.95rem;" v-html="update.text"></div>
                             
                             <a v-if="update.link && update.link !== '#'" :href="update.link" target="_blank" class="text-decoration-none mt-auto fw-bold" :class="update.platform === 'Twitter (X)' ? 'text-dark' : 'text-primary'">
                                 View full post &rarr;

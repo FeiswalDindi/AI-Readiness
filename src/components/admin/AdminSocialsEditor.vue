@@ -53,7 +53,7 @@ const formatLastUpdated = (dateString) => {
                   </select>
               </td>
               <td>
-                  <textarea v-model="post.text" @input="updateTimestamp(post)" class="form-control form-control-sm" rows="1"></textarea>
+                  <RichTextEditor v-model="post.text" />
               </td>
               <td><input v-model="post.link" type="text" class="form-control form-control-sm"></td>
               <td class="small text-muted">{{ formatLastUpdated(post.date) }}</td>
@@ -64,7 +64,7 @@ const formatLastUpdated = (dateString) => {
       </div>
 
       <div class="d-md-none d-flex flex-column gap-3">
-            <div v-for="(post, index) in socials" :key="post.id" class="bg-light p-3 rounded border">
+            <div v-for="(post, index) in socials" :key="post.id" class="bg-light p-3 rounded-0 border">
                <div class="d-flex justify-content-between mb-2 align-items-center">
                   <select v-model="post.platform" class="form-select form-select-sm w-auto shadow-sm" @change="updateTimestamp(post)">
                       <option value="LinkedIn">LinkedIn</option>
@@ -73,7 +73,7 @@ const formatLastUpdated = (dateString) => {
                   </select>
                   <button @click="removeSocialPost(index)" class="btn btn-sm text-danger fw-bold">Delete</button>
                </div>
-               <textarea v-model="post.text" @input="updateTimestamp(post)" class="form-control form-control-sm mb-2" rows="3" placeholder="Post Content"></textarea>
+               <RichTextEditor v-model="post.text" />
                <input v-model="post.link" type="text" class="form-control form-control-sm mb-2" placeholder="Link URL">
             </div>
       </div>

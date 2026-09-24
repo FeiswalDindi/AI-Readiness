@@ -4,6 +4,7 @@ import App from './App.vue'
 import router from './router'
 import { store } from './store' // Import the store
 import scrollReveal from './directives/scrollReveal'
+import RichTextEditor from './components/admin/RichTextEditor.vue'
 
 // Bootstrap
 import 'bootstrap/dist/css/bootstrap.min.css'
@@ -27,6 +28,7 @@ router.afterEach((to) => {
 });
 
 app.directive('scroll-reveal', scrollReveal)
+app.component('RichTextEditor', RichTextEditor)
 
 app.mount('#app')
 
