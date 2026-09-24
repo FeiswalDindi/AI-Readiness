@@ -84,13 +84,16 @@ const formatDate = (d) => {
         </div>
         
         <div class="d-flex align-items-center gap-3">
-             <div class="user-pill bg-white px-3 py-2 rounded-pill shadow-sm border border-light d-flex align-items-center gap-2">
+             <a v-if="!store.userProfile?.surveyCompleted" :href="store.content.qualtricsLink" target="_blank" class="btn btn-gold rounded-0 px-4 py-2 fw-bold shadow-sm text-navy d-none d-md-block">
+                 Take Pilot Survey
+             </a>
+             <div class="user-pill bg-white px-3 py-2 rounded-0 shadow-sm border border-light d-flex align-items-center gap-2">
                  <img :src="user.avatar || user.photoURL" class="rounded-circle border" width="32" height="32" referrerpolicy="no-referrer">
                  <div class="d-none d-sm-block">
                     <span class="small fw-bold text-navy d-block">{{ user.email }}</span>
                  </div>
              </div>
-             <button @click="handleLogout" class="btn btn-navy-outline btn-sm rounded-pill px-4 fw-bold shadow-sm">
+             <button @click="handleLogout" class="btn btn-navy-outline btn-sm rounded-0 px-4 fw-bold shadow-sm">
                  Sign Out
              </button>
         </div>
@@ -99,10 +102,10 @@ const formatDate = (d) => {
       <!-- SURVEY INFORMATION SECTION -->
       <div class="row g-4 mb-5">
           <div class="col-lg-6">
-              <div class="card border-0 shadow-sm rounded-4 h-100">
+              <div class="card border-0 shadow-sm rounded-0 h-100">
                   <div class="card-header bg-white p-4 border-bottom d-flex justify-content-between align-items-center">
                       <h5 class="fw-bold m-0 text-navy">Completed Surveys</h5>
-                      <span class="badge bg-light-green text-success fw-bold px-3 py-2 rounded-pill shadow-sm">{{ surveys.completed.length }} Total</span>
+                      <span class="badge bg-light-green text-success fw-bold px-3 py-2 rounded-0 shadow-sm">{{ surveys.completed.length }} Total</span>
                   </div>
                   <div class="list-group list-group-flush">
                       <div v-if="surveys.completed.length === 0" class="p-5 text-center text-muted">
@@ -114,7 +117,7 @@ const formatDate = (d) => {
                               <small class="text-muted"><i class="bi bi-calendar-check"></i> Completed on {{ survey.date }}</small>
                           </div>
                           <div class="text-end">
-                              <span class="badge bg-gold text-navy fw-bold px-3 py-1 rounded-pill mb-1 d-block">{{ survey.points }}</span>
+                              <span class="badge bg-gold text-navy fw-bold px-3 py-1 rounded-0 mb-1 d-block">{{ survey.points }}</span>
                               <small class="text-success fw-bold" style="font-size: 0.7rem;">✔ {{ survey.status }}</small>
                           </div>
                       </div>
@@ -123,10 +126,10 @@ const formatDate = (d) => {
           </div>
 
           <div class="col-lg-6">
-              <div class="card border-0 shadow-sm rounded-4 h-100 bg-navy text-white">
+              <div class="card border-0 shadow-sm rounded-0 h-100 bg-navy text-white">
                   <div class="card-header border-bottom border-light border-opacity-10 p-4 d-flex justify-content-between align-items-center">
                       <h5 class="fw-bold m-0 text-gold">Upcoming Surveys</h5>
-                      <span class="badge bg-white-10 text-white fw-bold px-3 py-2 rounded-pill">Action Required</span>
+                      <span class="badge bg-white-10 text-white fw-bold px-3 py-2 rounded-0">Action Required</span>
                   </div>
                   <div class="list-group list-group-flush flex-grow-1">
                       <div v-if="surveys.upcoming.length === 0" class="p-5 text-center text-white-50">
@@ -137,10 +140,10 @@ const formatDate = (d) => {
                               <span class="fw-bold d-block mb-1">{{ survey.title }}</span>
                               <small class="text-white-50">⏱ Est: {{ survey.estTime }} • {{ survey.date }}</small>
                           </div>
-                          <a v-if="survey.status === 'Action Required'" :href="survey.actionUrl" target="_blank" class="btn btn-gold btn-sm rounded-pill px-4 fw-bold shadow-sm text-navy">
+                          <a v-if="survey.status === 'Action Required'" :href="survey.actionUrl" target="_blank" class="btn btn-gold btn-sm rounded-0 px-4 fw-bold shadow-sm text-navy">
                               Take Survey
                           </a>
-                          <button v-else disabled class="btn btn-outline-light btn-sm rounded-pill px-4 fw-bold opacity-50">
+                          <button v-else disabled class="btn btn-outline-light btn-sm rounded-0 px-4 fw-bold opacity-50">
                               <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="me-1 mb-1" viewBox="0 0 16 16"><path d="M8 1a2 2 0 0 1 2 2v4H6V3a2 2 0 0 1 2-2zm3 6V3a3 3 0 0 0-6 0v4a2 2 0 0 0-2 2v5a2 2 0 0 0 2 2h6a2 2 0 0 0 2-2V9a2 2 0 0 0-2-2z"/></svg>
                               Locked
                           </button>
@@ -157,7 +160,7 @@ const formatDate = (d) => {
                   <h4 class="fw-bold text-navy m-0">Project Insights & News</h4>
                   <p class="text-muted small mb-0">Latest updates on AI readiness and job markets</p>
               </div>
-              <router-link to="/insights" class="btn btn-outline-navy btn-sm rounded-pill px-4 fw-bold">View All ➝</router-link>
+              <router-link to="/insights" class="btn btn-outline-navy btn-sm rounded-0 px-4 fw-bold">View All ➝</router-link>
           </div>
           
           <div v-if="newsLoading" class="text-center py-5">
@@ -167,12 +170,12 @@ const formatDate = (d) => {
 
           <div v-else class="row g-4">
               <div v-for="(article, index) in news" :key="index" class="col-md-6 col-xl-3">
-                  <a :href="article.link" target="_blank" class="card border-0 shadow-sm rounded-4 h-100 text-decoration-none news-card overflow-hidden">
+                  <a :href="article.link" target="_blank" class="card border-0 shadow-sm rounded-0 h-100 text-decoration-none news-card overflow-hidden">
                       <div class="card-img-top news-image" :style="{ backgroundImage: `url(${article.image_url || 'https://images.unsplash.com/photo-1451187580459-43490279c0fa?w=500&auto=format&fit=crop'})` }">
                       </div>
                       <div class="card-body p-4 d-flex flex-column">
                           <div class="d-flex justify-content-between align-items-center mb-3">
-                              <span class="badge bg-light-gold text-gold fw-bold text-uppercase" style="font-size: 0.65rem;">{{ article.source_id }}</span>
+                              <span class="badge bg-light-gold text-gold fw-bold text-uppercase rounded-0" style="font-size: 0.65rem;">{{ article.source_id }}</span>
                               <span class="small text-muted fw-bold" style="font-size: 0.75rem">{{ formatDate(article.pubDate) }}</span>
                           </div>
                           <h6 class="text-navy fw-bold mb-3 line-clamp-3" style="line-height: 1.5; font-size: 1.05rem;">{{ article.title }}</h6>
