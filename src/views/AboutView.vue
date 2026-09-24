@@ -1,6 +1,5 @@
 <script setup>
 import { store } from '../store'; 
-import Clients from '../components/Clients.vue'; // We can repurpose this as "Participating Institutions"
 </script>
 
 <template>
@@ -72,8 +71,6 @@ import Clients from '../components/Clients.vue'; // We can repurpose this as "Pa
         </div>
       </div>
     </section>
-
-    <Clients />
 
   </main>
 </template>

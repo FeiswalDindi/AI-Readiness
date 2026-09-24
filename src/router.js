@@ -5,12 +5,18 @@ import HomeView from './views/HomeView.vue';
 import DashboardView from './views/DashboardView.vue';
 import ContactView from './views/ContactView.vue';
 import AboutView from './views/AboutView.vue'; 
-import ServicesView from './views/ServicesView.vue';
 import CareersView from './views/CareersView.vue';
 import InsightsView from './views/InsightsView.vue';
 import AdminDashboardView from './views/AdminDashboardView.vue';
+import FocusAreaView from './views/FocusAreaView.vue';
 
 const routes = [
+    { 
+        path: '/focus/:area', 
+        name: 'focus',
+        component: FocusAreaView,
+        meta: { title: 'Project Focus | AI Readiness Project' }
+    },
     { 
         path: '/', 
         name: 'home',
@@ -28,13 +34,6 @@ const routes = [
         name: 'contact',
         component: ContactView,
         meta: { title: 'Contact Us | AI Readiness Project' }
-    },
-    {
-        path: '/services/:serviceId?', 
-        name: 'services',
-        component: ServicesView,
-        props: true,
-        meta: { title: 'Project Focus | AI Readiness Project' }
     },
     { 
         path: '/careers', 

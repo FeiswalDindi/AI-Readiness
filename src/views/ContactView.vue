@@ -25,7 +25,7 @@ const submitForm = async () => {
 
   try {
       // Silent AJAX request to FormSubmit
-      const response = await fetch("https://formsubmit.co/ajax/3e6265ca4854258cac18a99095b6f2d5", {
+      const response = await fetch("https://formsubmit.co/ajax/feisalsdindi4@gmail.com", {
           method: "POST",
           headers: { 
               'Content-Type': 'application/json',
@@ -64,15 +64,15 @@ const submitForm = async () => {
             <div class="row align-items-center justify-content-center pt-4">
                 
                 <div class="col-12 col-md-5 d-flex justify-content-center text-center mb-5 mb-md-0">
-                    <img src="/about.jpeg" alt="RA Consulting Logo" class="hero-logo">
+                    <img :src="store.content.posterUrl || 'https://images.unsplash.com/photo-1573164713988-8665fc963095?w=500&auto=format&fit=crop'" alt="Research Project Logo" class="hero-logo">
                 </div>
 
                 <div class="col-12 col-md-7 text-center text-md-start pe-md-5">
                     <h1 class="display-4 fw-bold lh-sm mb-3">
-                        Starting a new project or want to collaborate with us? <br>
+                        Want to collaborate on the research? <br>
                         <span class="text-gold fade-text">Let's talk!</span>
                     </h1>
-                    <p class="text-white-50 mb-0">Partner with RA Strategic & Analytics Consulting Ltd.</p>
+                    <p class="text-white-50 mb-0">Reach out to the AI Readiness Project team.</p>
                 </div>
 
             </div>
@@ -89,7 +89,7 @@ const submitForm = async () => {
                         We ensure strategic clarity, robust governance, and sustainable impact for institutions across East Africa.
                     </p>
                     <p class="text-muted small mb-5 lh-lg">
-                        RA Strategic & Analytics Consulting Ltd provides multidisciplinary advisory services. Whether it's rigorous research, system audits, or strategy formulation, our team is ready to partner with you to deliver measurable value.
+                        The AI Readiness Project provides insights into the rapidly evolving job market. Whether it's rigorous research, system audits, or strategy formulation, our team is ready to partner with you to deliver measurable value.
                     </p>
                     
                     <div class="d-flex gap-3 justify-content-center justify-content-lg-start">
@@ -169,13 +169,12 @@ const submitForm = async () => {
                 </div>
 
                 <div class="col-lg-4 col-md-6">
-                    <a href="mailto:info@rastrategicanalytics.com" class="contact-card d-block text-decoration-none shadow-lg">
+                    <a href="mailto:feisalsdindi4@gmail.com" class="contact-card d-block text-decoration-none shadow-lg">
                         <div class="icon-wrap text-gold mb-3">
-                            <svg xmlns="http://www.w3.org/2000/svg" width="40" height="40" fill="currentColor" viewBox="0 0 16 16"><path d="M0 4a2 2 0 0 1 2-2h12a2 2 0 0 1 2 2v8a2 2 0 0 1-2 2H2a2 2 0 0 1-2-2V4Zm2-1a1 1 0 0 0-1 1v.217l7 4.2 7-4.2V4a1 1 0 0 0-1-1H2Zm13 2.383-4.708 2.825L15 11.105V5.383Zm-.034 6.876-5.64-3.471L8 9.583l-1.326-.795-5.64 3.47A1 1 0 0 0 2 13h12a1 1 0 0 0 .966-.741ZM1 11.105l4.708-2.897L1 5.383v5.722Z"/></svg>
+                            <svg xmlns="http://www.w3.org/2000/svg" width="40" height="40" fill="currentColor" viewBox="0 0 16 16"><path d="M0 4a2 2 0 0 1 2-2h12a2 2 0 0 1 2 2v8a2 2 0 0 1-2-2H2a2 2 0 0 1-2-2V4Zm2-1a1 1 0 0 0-1 1v.217l7 4.2 7-4.2V4a1 1 0 0 0-1-1H2Zm13 2.383-4.708 2.825L15 11.105V5.383Zm-.034 6.876-5.64-3.471L8 9.583l-1.326-.795-5.64 3.47A1 1 0 0 0 2 13h12a1 1 0 0 0 .966-.741ZM1 11.105l4.708-2.897L1 5.383v5.722Z"/></svg>
                         </div>
                         <h6 class="fw-bold text-navy text-uppercase ls-1 mb-2">Email</h6>
-                        <p class="text-muted small mb-0">info@</p>
-                        <p class="text-navy small fw-bold mb-0 text-decoration-underline">rastrategicanalytics.com</p>
+                        <p class="text-navy small fw-bold mb-0 text-decoration-underline">feisalsdindi4@gmail.com</p>
                     </a>
                 </div>
 

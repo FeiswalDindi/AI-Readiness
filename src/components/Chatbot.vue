@@ -7,15 +7,10 @@ const API_KEY = import.meta.env.VITE_GEMINI_API_KEY;
 const STORAGE_KEY = 'ra_chat_history';
 
 const SYSTEM_PROMPT = `
-You are the "RA Smart Assistant", a professional AI consultant for 'RA Strategic & Analytics Consulting Ltd', based in Nairobi, Kenya.
+You are the "AI Readiness Assistant", a research assistant for the 'AI Readiness Project' in East Africa.
 Your tone is: Professional, insightful, concise, and helpful.
-We specialize in 4 key pillars:
-1. Research, Policy & M&E Advisory
-2. Strategic Corporate Advisory
-3. ICT & Data Analytics Services
-4. Products & Solutions (SPSS, STATA, NVivo)
-Contact details: +254-790-583-820 or info@rastrategicanalytics.com.
-Your goal is to help clients understand our expertise and encourage them to book a consultation or send a message. Keep responses relatively short, well-formatted, and avoid markdown headers if possible.
+We specialize in understanding the intersection of AI and the rapidly evolving labor markets for university students.
+Your goal is to help participants take the pilot survey, explain the research, and direct them to the contact page or WhatsApp community if needed. Keep responses relatively short, well-formatted, and avoid markdown headers if possible.
 `;
 
 // --- STATE ---
@@ -38,7 +33,7 @@ const generateId = () => Date.now().toString(36) + Math.random().toString(36).su
 const defaultGreeting = { 
     id: generateId(), 
     sender: 'bot', 
-    text: 'Hello! I am the RA Smart Assistant. I can help you explore our services, case studies, or find the right strategy for your institution. How can I help you today?' 
+    text: 'Hello! I am the AI Readiness Assistant. I can help you explore our research or guide you to the pilot survey. How can I help you today?' 
 };
 
 const messages = ref([]);
@@ -91,7 +86,7 @@ const handleScroll = () => { isExpanded.value = window.scrollY < 100; };
 const buildPromptHistory = () => {
     let history = [
         { role: 'user', parts: [{ text: SYSTEM_PROMPT }] },
-        { role: 'model', parts: [{ text: "Understood. I will assist clients accordingly." }] }
+        { role: 'model', parts: [{ text: "Understood. I will assist participants accordingly." }] }
     ];
 
     const chatMessages = messages.value.filter(m => m.sender !== 'error' && m.text.trim() !== '');
@@ -236,9 +231,9 @@ const sendMessage = async () => {
             
             <div class="chat-header bg-navy text-white d-flex justify-content-between align-items-center p-3">
                 <div class="d-flex align-items-center gap-3">
-                    <div class="bot-avatar bg-white text-navy fw-bold rounded-circle d-flex align-items-center justify-content-center shadow-sm">RA</div>
+                    <div class="bot-avatar bg-white text-navy fw-bold rounded-circle d-flex align-items-center justify-content-center shadow-sm">AI</div>
                     <div>
-                        <h6 class="mb-0 fw-bold">RA Assistant</h6>
+                        <h6 class="mb-0 fw-bold">Project Assistant</h6>
                         <div class="d-flex align-items-center gap-1">
                              <span class="status-dot"></span>
                              <small class="text-white-50" style="font-size: 0.75rem;">Online</small>

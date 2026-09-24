@@ -1,14 +1,8 @@
 <script setup>
 import { store } from '../store'; // <-- Added the store import
 
-// The phone number must include country code without the '+' 
-const phoneNumber = "254790583820";
-
-// URL encoded message so spaces and characters format properly in WhatsApp
-// This reads: "Hello RA Consulting, I am contacting you from your website. I would like to inquire about..."
-const prefilledMessage = "Hello%20RA%20Consulting%2C%20I%20am%20contacting%20you%20from%20your%20website.%20I%20would%20like%20to%20inquire%20about...";
-
-const whatsappUrl = `https://wa.me/${phoneNumber}?text=${prefilledMessage}`;
+// Uses the WhatsApp community link configured in store.js
+const whatsappUrl = store.content.whatsappLink;
 </script>
 
 <template>

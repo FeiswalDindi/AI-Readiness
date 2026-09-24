@@ -111,7 +111,7 @@ const generateReport = () => {
       <div class="d-flex flex-column flex-md-row justify-content-between align-items-center mb-5 border-bottom pb-4 gap-4">
           <div class="text-center text-md-start">
               <h6 class="text-gold fw-bold ls-2 small text-uppercase mb-1">Management Console</h6>
-              <h1 class="display-5 fw-bold text-navy mb-0">RA Dashboard</h1>
+              <h1 class="display-5 fw-bold text-navy mb-0">Project Admin</h1>
           </div>
           <div class="d-flex flex-wrap gap-3 justify-content-center">
               <button @click="goToFirestore" class="btn btn-white border shadow-sm btn-sm px-3 py-2 rounded-pill d-flex align-items-center gap-2 text-navy fw-bold hover-lift">
@@ -175,15 +175,20 @@ const generateReport = () => {
               Project & Survey Settings
           </h5>
           <div class="row g-4">
-              <div class="col-md-6">
-                  <label class="form-label small fw-bold text-muted text-uppercase ls-1">Main Survey Date (Countdown Target)</label>
+              <div class="col-md-4">
+                  <label class="form-label small fw-bold text-muted text-uppercase ls-1">Main Survey Date</label>
                   <input type="datetime-local" v-model="draftContent.countdownDate" class="form-control bg-light border-0 py-3">
                   <small class="text-muted d-block mt-2">Sets the countdown timer on the landing page.</small>
               </div>
-              <div class="col-md-6">
+              <div class="col-md-4">
                   <label class="form-label small fw-bold text-muted text-uppercase ls-1">Poster Image URL</label>
                   <input type="url" v-model="draftContent.posterUrl" class="form-control bg-light border-0 py-3" placeholder="https://example.com/poster.jpg">
                   <small class="text-muted d-block mt-2">Leave blank to show the placeholder.</small>
+              </div>
+              <div class="col-md-4">
+                  <label class="form-label small fw-bold text-muted text-uppercase ls-1">Project Logo URL</label>
+                  <input type="url" v-model="draftContent.logoUrl" class="form-control bg-light border-0 py-3" placeholder="https://example.com/logo.jpg">
+                  <small class="text-muted d-block mt-2">Navbar logo image link.</small>
               </div>
           </div>
       </div>

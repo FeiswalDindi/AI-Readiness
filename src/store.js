@@ -49,6 +49,7 @@ export const store = reactive({
     about: { title: 'AI Readiness in Education', text: 'Measuring the impact of AI in educational institutions and rapidly evolving labor markets.' },
     countdownDate: '2026-12-01T10:00:00',
     posterUrl: '',
+    logoUrl: '',
     mission: 'To empower organizations across Eastern Africa with data-driven insights and strategic clarity to achieve sustainable growth and impact.',
     vision: 'To offer scalable policy levers for educational institutions and policymakers to improve job search processes and job market readiness of students.',
     whatsappLink: 'https://chat.whatsapp.com/FDJbRo6Uhhe1nAeMQqiSbU',
