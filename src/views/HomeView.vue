@@ -6,8 +6,17 @@ const timeLeft = ref({ days: 0, hours: 0, minutes: 0, seconds: 0 });
 let timerInterval;
 let slideInterval;
 const currentSlide = ref(0);
+const selectedMember = ref(null);
 
 const slides = computed(() => store.content.heroSlides || []);
+
+const openMemberModal = (member) => {
+    selectedMember.value = member;
+};
+
+const closeMemberModal = () => {
+    selectedMember.value = null;
+};
 
 const nextSlide = () => {
     if (slides.value.length > 0) {
@@ -155,22 +164,22 @@ onUnmounted(() => {
     <section class="py-5 bg-light">
         <div class="container py-4">
             <div class="row g-4">
-                <div class="col-md-6">
-                    <div class="card h-100 border-0 shadow-sm p-4 rounded-4 text-center">
+                <div class="col-md-6" v-scroll-reveal="{ delay: 100 }">
+                    <div class="card h-100 border-0 shadow-sm p-4 rounded-4 text-center mission-card">
                         <div class="icon-circle mx-auto mb-3 text-gold">
                             <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" fill="currentColor" viewBox="0 0 16 16"><path d="M8 15A7 7 0 1 1 8 1a7 7 0 0 1 0 14m0 1A8 8 0 1 0 8 0a8 8 0 0 0 0 16"/><path d="M5.255 5.786a.237.237 0 0 0 .241.247h.825c.138 0 .248-.113.266-.25.09-.656.54-1.134 1.342-1.134.686 0 1.314.343 1.314 1.168 0 .635-.374.927-.965 1.371-.673.489-1.206 1.06-1.168 1.987l.003.217a.25.25 0 0 0 .25.246h.811a.25.25 0 0 0 .25-.25v-.105c0-.718.273-.927 1.01-1.486.609-.463 1.244-.977 1.244-2.056 0-1.511-1.276-2.241-2.673-2.241-1.267 0-2.655.59-2.75 2.286M7.5 13h1a.5.5 0 0 0 .5-.5v-1a.5.5 0 0 0-.5-.5h-1a.5.5 0 0 0-.5.5v1a.5.5 0 0 0 .5.5"/></svg>
                         </div>
-                        <h3 class="fw-bold text-navy mb-3">Our Mission</h3>
-                        <p class="text-muted">{{ store.content.mission }}</p>
+                        <h3 class="fw-bold text-navy mb-3 position-relative d-inline-block card-title-underline">Our Mission</h3>
+                        <p class="text-muted fs-5 lh-lg">{{ store.content.mission }}</p>
                     </div>
                 </div>
-                <div class="col-md-6">
-                    <div class="card h-100 border-0 shadow-sm p-4 rounded-4 text-center">
+                <div class="col-md-6" v-scroll-reveal="{ delay: 200 }">
+                    <div class="card h-100 border-0 shadow-sm p-4 rounded-4 text-center mission-card">
                         <div class="icon-circle mx-auto mb-3 text-gold">
                             <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" fill="currentColor" viewBox="0 0 16 16"><path d="M8 16a2 2 0 0 0 2-2H6a2 2 0 0 0 2 2M8 1.918l-.797.161A4 4 0 0 0 4 6c0 .628-.134 2.197-.459 3.742-.16.767-.376 1.566-.663 2.258h10.244c-.287-.692-.502-1.49-.663-2.258C12.134 8.197 12 6.628 12 6a4 4 0 0 0-3.203-3.92zM14.22 12c.223.447.481.801.78 1H1c.299-.199.557-.553.78-1C2.68 10.2 3 6.88 3 6c0-2.42 1.72-4.44 4.005-4.901a1 1 0 1 1 1.99 0A5 5 0 0 1 13 6c0 .88.32 4.2 1.22 6"/></svg>
                         </div>
-                        <h3 class="fw-bold text-navy mb-3">Our Vision</h3>
-                        <p class="text-muted">{{ store.content.vision }}</p>
+                        <h3 class="fw-bold text-navy mb-3 position-relative d-inline-block card-title-underline">Our Vision</h3>
+                        <p class="text-muted fs-5 lh-lg">{{ store.content.vision }}</p>
                     </div>
                 </div>
             </div>
@@ -185,16 +194,45 @@ onUnmounted(() => {
             
             <div class="row g-4 justify-content-center">
                 <div class="col-md-6 col-lg-4" v-for="member in store.content.team" :key="member.name">
-                    <div class="card h-100 border-0 shadow-sm text-center team-card p-4">
+                    <div 
+                        class="card h-100 border-0 shadow-sm text-center team-card p-4 cursor-pointer"
+                        @click="openMemberModal(member)"
+                    >
                         <img :src="member.imageUrl || `https://ui-avatars.com/api/?name=${encodeURIComponent(member.name)}&background=1b2c57&color=fff&size=128`" class="rounded-circle mx-auto mb-3 shadow" style="width:120px; height:120px; object-fit: cover;" alt="Avatar">
                         <h5 class="fw-bold text-navy mb-1">{{ member.name }}</h5>
                         <p class="text-gold small fw-bold mb-3 text-uppercase">{{ member.role }}</p>
-                        <p class="text-muted small px-2">{{ member.description }}</p>
+                        
+                        <div class="mt-auto">
+                            <span class="text-muted small fw-bold read-more-text">View Profile <i class="bi bi-arrow-right"></i></span>
+                        </div>
                     </div>
                 </div>
             </div>
         </div>
     </section>
+
+    <!-- TEAM MEMBER MODAL -->
+    <transition name="fade">
+        <div v-if="selectedMember" class="modal-overlay" @click.self="closeMemberModal">
+            <div class="glass-card bg-white position-relative shadow-lg border-0">
+                <button class="close-btn text-navy shadow-sm border" @click="closeMemberModal">×</button>
+                
+                <div class="text-center mb-4">
+                    <img :src="selectedMember.imageUrl || `https://ui-avatars.com/api/?name=${encodeURIComponent(selectedMember.name)}&background=1b2c57&color=fff&size=128`" class="rounded-circle shadow-lg mb-3 border border-4 border-white" style="width: 150px; height: 150px; object-fit: cover; margin-top: -80px;">
+                    <h3 class="fw-bold text-navy mb-1">{{ selectedMember.name }}</h3>
+                    <h6 class="text-gold fw-bold text-uppercase ls-1 mb-4">{{ selectedMember.role }}</h6>
+                    
+                    <div class="bg-light-navy p-4 rounded-4 text-start border position-relative overflow-hidden">
+                        <svg class="position-absolute opacity-10" style="top:-20px; right:-20px" xmlns="http://www.w3.org/2000/svg" width="120" height="120" fill="#1b2c57" viewBox="0 0 16 16"><path d="M8 15A7 7 0 1 1 8 1a7 7 0 0 1 0 14m0 1A8 8 0 1 0 8 0a8 8 0 0 0 0 16"/></svg>
+                        <h6 class="fw-bold text-navy mb-3"><i class="bi bi-person-lines-fill me-2 text-gold"></i>About</h6>
+                        <p class="text-muted mb-0 lh-lg" style="white-space: pre-wrap;">{{ selectedMember.description || "No description provided." }}</p>
+                    </div>
+                </div>
+                
+                <button @click="closeMemberModal" class="btn btn-navy w-100 rounded-pill py-3 fw-bold mt-2">Close Profile</button>
+            </div>
+        </div>
+    </transition>
 
     <!-- SOCIAL UPDATES / COMMUNITY FEED -->
     <section class="py-5 bg-light-navy" v-if="store.content.socialUpdates && store.content.socialUpdates.length > 0">
@@ -335,4 +373,33 @@ onUnmounted(() => {
 .card-facebook { border-top: 4px solid #1877F2 !important; background-color: #f0f2f5; }
 
 .platform-icon-wrap svg { filter: drop-shadow(0 2px 4px rgba(0,0,0,0.1)); }
+
+.mission-card { transition: all 0.3s ease; border: 1px solid transparent !important; }
+.mission-card:hover { transform: translateY(-10px); box-shadow: 0 15px 30px rgba(27, 44, 87, 0.08) !important; border-color: rgba(190, 164, 41, 0.3) !important; }
+.card-title-underline::after { content: ''; position: absolute; bottom: -8px; left: 50%; transform: translateX(-50%); width: 40px; height: 3px; background: #bea429; transition: width 0.3s ease; border-radius: 2px; }
+.mission-card:hover .card-title-underline::after { width: 80px; }
+
+.team-card { transition: all 0.3s ease; border: 1px solid transparent !important; }
+.team-card:hover { transform: translateY(-10px); box-shadow: 0 15px 30px rgba(27, 44, 87, 0.08) !important; border-color: rgba(190, 164, 41, 0.3) !important; }
+
+.cursor-pointer { cursor: pointer; }
+.read-more-text { opacity: 0; transition: opacity 0.3s; }
+.team-card:hover .read-more-text { opacity: 1; }
+
+.modal-overlay {
+  position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+  background: rgba(27, 44, 87, 0.6); backdrop-filter: blur(8px);
+  display: flex; justify-content: center; align-items: center; z-index: 11000;
+  padding: 20px;
+}
+.glass-card {
+  border-radius: 24px; padding: 40px 30px 30px 30px; width: 100%; max-width: 500px;
+  margin-top: 50px;
+}
+.close-btn {
+  position: absolute; top: -15px; right: -15px; background: white; border: none;
+  width: 40px; height: 40px; border-radius: 50%; font-size: 24px; font-weight: bold;
+  cursor: pointer; display: flex; align-items: center; justify-content: center; transition: 0.3s;
+}
+.close-btn:hover { background: #f8f9fa; transform: scale(1.1); }
 </style>
