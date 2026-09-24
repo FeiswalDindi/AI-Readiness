@@ -34,9 +34,7 @@ const handleAdminClick = () => {
         
         <div class="col-lg-4 col-md-6">
           <h5 class="fw-bold mb-3 d-flex align-items-center gap-2">
-            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="#bea429" viewBox="0 0 16 16">
-               <path d="M8 16a2 2 0 0 0 2-2H6a2 2 0 0 0 2 2zm.995-14.901a1 1 0 1 0-1.99 0A5.002 5.002 0 0 0 3 6c0 1.098-.5 6-2 7h14c-1.5-1-2-5.902-2-7 0-2.42-1.72-4.44-4.005-4.901z"/>
-            </svg>
+            <img :src="store.content.logoUrl || 'https://ui-avatars.com/api/?name=AR&background=bea429&color=1b2c57'" class="rounded" width="30" height="30" alt="Logo">
             <span class="text-white">AI Readiness</span>
           </h5>
           <p class="text-white-50 small mb-4 pe-lg-4">

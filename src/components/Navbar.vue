@@ -76,7 +76,7 @@ onUnmounted(() => {
       
       <router-link class="navbar-brand fw-bold brand-container" to="/" @click="closeMenu">
         <span class="brand-text" :class="isScrolled ? 'text-navy' : 'text-white'">AI Readiness</span>
-        <img :src="store.content.logoUrl || 'https://ui-avatars.com/api/?name=AI&background=bea429&color=1b2c57'" alt="Project Logo" class="brand-logo" :class="{ 'show-logo': isScrolled }">
+        <img :src="store.content.logoUrl || 'https://ui-avatars.com/api/?name=AR&background=bea429&color=1b2c57'" alt="Project Logo" class="brand-logo" :class="{ 'show-logo': isScrolled }">
       </router-link>
 
       <button class="navbar-toggler border-0" type="button" @click="toggleMenu" :aria-expanded="isMenuOpen">

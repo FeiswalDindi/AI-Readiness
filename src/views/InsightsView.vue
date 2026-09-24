@@ -1,5 +1,6 @@
 <script setup>
 import { ref, onMounted } from 'vue';
+import { store } from '../store';
 
 const articles = ref([]);
 const loading = ref(true);
@@ -88,16 +89,11 @@ const handleImageError = (e) => {
         
         <div class="header-logo mx-auto mb-4" v-scroll-reveal>
             <img 
-                v-if="!imgFailed" 
-                src="/favicon.jpeg" 
-                alt="RA Logo" 
-                @error="imgFailed = true" 
-                class="banner-logo-img"
+                :src="store.content.logoUrl || 'https://ui-avatars.com/api/?name=AR&background=1b2c57&color=fff'" 
+                alt="Project Logo" 
+                class="banner-logo-img rounded-circle shadow-lg border border-4 border-gold"
+                style="width: 100px; height: 100px; object-fit: cover; background: white;"
             >
-            <svg v-else class="banner-logo-svg" viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
-                <circle cx="50" cy="50" r="48" fill="#1b2c57" stroke="#bea429" stroke-width="4"/>
-                <path d="M35 65 L50 25 L65 65 M40 50 L60 50" stroke="#bea429" stroke-width="6" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
-            </svg>
         </div>
 
         <h6 class="text-gold ls-2 text-uppercase mb-3 fw-bold" v-scroll-reveal="{ delay: 100 }">Market Intelligence</h6>

@@ -282,7 +282,7 @@ onUnmounted(() => {
                             <div class="d-flex align-items-center mb-3">
                                 <!-- Top Left: AR Avatar -->
                                 <div class="me-3">
-                                    <img src="https://ui-avatars.com/api/?name=AI+Readiness&background=1b2c57&color=fff" class="rounded-circle shadow-sm border border-white" style="width: 48px; height: 48px;" alt="Avatar">
+                                    <img :src="store.content.logoUrl || 'https://ui-avatars.com/api/?name=AR&background=1b2c57&color=fff'" class="rounded-circle shadow-sm border border-white" style="width: 48px; height: 48px;" alt="Avatar">
                                 </div>
                                 
                                 <div>
