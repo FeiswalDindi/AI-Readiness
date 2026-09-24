@@ -19,6 +19,28 @@ const removeSlide = (index) => {
         props.slides.splice(index, 1);
     }
 };
+
+import { ref } from 'vue';
+import { store } from '../../store';
+
+const uploadingState = ref({});
+
+const handleImageUpload = async (event, index) => {
+    const file = event.target.files[0];
+    if (!file) return;
+    
+    uploadingState.value[index] = true;
+    try {
+        const url = await store.uploadImage(file, 'slides');
+        props.slides[index].image = url;
+    } catch (e) {
+        alert("Upload failed. Ensure Firebase Storage is enabled.");
+        console.error(e);
+    } finally {
+        uploadingState.value[index] = false;
+        event.target.value = '';
+    }
+};
 </script>
 
 <template>
@@ -43,7 +65,14 @@ const removeSlide = (index) => {
                     <input v-model="slide.subtitle" class="form-control form-control-sm mb-2">
                     
                     <label class="small text-muted fw-bold">Image URL</label>
-                    <input v-model="slide.image" class="form-control form-control-sm text-muted">
+                    <div class="input-group mb-2">
+                        <input v-model="slide.image" class="form-control form-control-sm text-muted">
+                        <input type="file" @change="e => handleImageUpload(e, index)" class="d-none" :id="'slideUpload_'+index" accept="image/*">
+                        <label :for="'slideUpload_'+index" class="input-group-text bg-white cursor-pointer fw-bold px-3 m-0" style="padding-top: 2px; padding-bottom: 2px;">
+                            <span v-if="uploadingState[index]" class="spinner-border spinner-border-sm" role="status"></span>
+                            <span v-else>Upload</span>
+                        </label>
+                    </div>
                 </div>
              </div>
           </div>

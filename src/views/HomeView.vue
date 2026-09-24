@@ -4,6 +4,16 @@ import { store } from '../store';
 
 const timeLeft = ref({ days: 0, hours: 0, minutes: 0, seconds: 0 });
 let timerInterval;
+let slideInterval;
+const currentSlide = ref(0);
+
+const slides = computed(() => store.content.heroSlides || []);
+
+const nextSlide = () => {
+    if (slides.value.length > 0) {
+        currentSlide.value = (currentSlide.value + 1) % slides.value.length;
+    }
+};
 
 const updateCountdown = () => {
     const target = new Date(store.content.countdownDate).getTime();
@@ -25,10 +35,12 @@ const updateCountdown = () => {
 onMounted(() => {
     updateCountdown();
     timerInterval = setInterval(updateCountdown, 1000);
+    slideInterval = setInterval(nextSlide, 5000);
 });
 
 onUnmounted(() => {
     clearInterval(timerInterval);
+    clearInterval(slideInterval);
 });
 </script>
 
@@ -36,18 +48,42 @@ onUnmounted(() => {
   <main>
     <!-- HERO / LANDING SECTION -->
     <header class="hero-section text-white d-flex align-items-center position-relative overflow-hidden">
+        
+        <!-- DYNAMIC BACKGROUND SLIDER -->
+        <div v-if="slides.length > 0">
+            <div 
+                v-for="(slide, index) in slides" 
+                :key="index"
+                class="hero-bg"
+                :style="{ backgroundImage: `url(${slide.image})` }"
+                :class="{ 'active': currentSlide === index }"
+            ></div>
+        </div>
         <div class="overlay"></div>
+
         <div class="container position-relative z-2 pt-5 mt-5">
             <div class="row align-items-center g-5">
                 
                 <!-- Left: Info & Actions -->
                 <div class="col-lg-6 text-center text-lg-start">
-                    <h1 class="display-4 fw-bold mb-4 animate-title text-white">
-                        {{ store.content.about.title }}
-                    </h1>
-                    <p class="lead mb-4 opacity-75 fs-5 animate-subtitle pe-lg-4">
-                        {{ store.content.about.text }}
-                    </p>
+                    <transition name="fade" mode="out-in">
+                        <div :key="currentSlide" v-if="slides.length > 0 && slides[currentSlide]">
+                            <h1 class="display-4 fw-bold mb-4 animate-title text-white">
+                                {{ slides[currentSlide].title || store.content.about.title }}
+                            </h1>
+                            <p class="lead mb-4 opacity-75 fs-5 animate-subtitle pe-lg-4">
+                                {{ slides[currentSlide].subtitle || store.content.about.text }}
+                            </p>
+                        </div>
+                        <div v-else>
+                            <h1 class="display-4 fw-bold mb-4 animate-title text-white">
+                                {{ store.content.about.title }}
+                            </h1>
+                            <p class="lead mb-4 opacity-75 fs-5 animate-subtitle pe-lg-4">
+                                {{ store.content.about.text }}
+                            </p>
+                        </div>
+                    </transition>
                     
                     <div class="d-flex flex-column flex-sm-row gap-3 mt-4 animate-buttons w-100">
                         <a :href="store.content.qualtricsLink" target="_blank" class="btn btn-gold btn-lg px-4 py-3 rounded-pill fw-bold shadow-lg">
@@ -84,7 +120,6 @@ onUnmounted(() => {
                             </div>
                         </div>
 
-                        <!-- Conditionally render poster if it exists in store -->
                         <div v-if="store.content.posterUrl" class="poster-container rounded overflow-hidden shadow">
                             <img :src="store.content.posterUrl" class="img-fluid" alt="Project Poster" />
                         </div>
@@ -95,6 +130,15 @@ onUnmounted(() => {
                 </div>
 
             </div>
+            
+            <div class="d-flex justify-content-center gap-2 mt-4" v-if="slides.length > 1">
+                <span 
+                    v-for="(slide, index) in slides" :key="index"
+                    class="dot" :class="{ 'active': currentSlide === index }"
+                    @click="currentSlide = index"
+                ></span>
+            </div>
+            
         </div>
     </header>
 
@@ -118,6 +162,31 @@ onUnmounted(() => {
                         </div>
                         <h3 class="fw-bold text-navy mb-3">Our Vision</h3>
                         <p class="text-muted">{{ store.content.vision }}</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- SOCIAL UPDATES / COMMUNITY FEED -->
+    <section class="py-5 bg-light-navy" v-if="store.content.socialUpdates && store.content.socialUpdates.length > 0">
+        <div class="container py-5">
+            <div class="text-center mb-5">
+                <h6 class="text-gold fw-bold ls-2 mb-2 text-uppercase">Community Feed</h6>
+                <h2 class="fw-bold text-navy display-6">Latest Updates</h2>
+            </div>
+            
+            <div class="row g-4 justify-content-center">
+                <div class="col-md-6 col-lg-4" v-for="update in store.content.socialUpdates" :key="update.id">
+                    <div class="card h-100 border-0 shadow-sm rounded-4 overflow-hidden">
+                        <div class="card-body p-4 d-flex flex-column">
+                            <div class="d-flex justify-content-between align-items-center mb-3">
+                                <span class="badge bg-gold text-navy fw-bold">{{ update.platform }}</span>
+                                <small class="text-muted fw-bold">{{ new Date(update.date).toLocaleDateString() }}</small>
+                            </div>
+                            <p class="card-text text-muted mb-4 flex-grow-1" style="white-space: pre-wrap;">{{ update.text }}</p>
+                            <a v-if="update.link && update.link !== '#'" :href="update.link" target="_blank" class="btn btn-outline-navy fw-bold rounded-pill btn-sm mt-auto">View on {{ update.platform }} &rarr;</a>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -189,4 +258,37 @@ onUnmounted(() => {
 .text-navy { color: #1b2c57 !important; }
 .text-gold { color: #bea429 !important; }
 .bg-gold { background-color: #bea429 !important; }
+</style>
+
+<style scoped>
+/* HERO SLIDER STYLES */
+.hero-section { background-color: #1b2c57; }
+.hero-bg {
+    position: absolute; top: 0; left: 0; width: 100%; height: 100%;
+    background-size: cover; background-position: center; opacity: 0;
+    transition: opacity 1.5s ease-in-out, transform 6s ease; transform: scale(1); z-index: 0;
+}
+.hero-bg.active { opacity: 0.8; transform: scale(1.05); }
+
+.overlay {
+    position: absolute; top: 0; left: 0; width: 100%; height: 100%;
+    background: linear-gradient(135deg, rgba(27, 44, 87, 0.98), rgba(27, 44, 87, 0.7)); z-index: 1;
+}
+
+.fade-enter-active, .fade-leave-active { transition: opacity 0.5s ease; }
+.fade-enter-from, .fade-leave-to { opacity: 0; }
+
+.dot { width: 12px; height: 12px; background: rgba(255,255,255,0.3); border-radius: 50%; cursor: pointer; transition: all 0.3s; }
+.dot.active { background: #bea429; transform: scale(1.3); box-shadow: 0 0 10px rgba(190, 164, 41, 0.5); }
+
+.bg-light-navy { background-color: #f4f6fa; }
+.btn-outline-navy {
+    color: #1b2c57;
+    border: 2px solid #1b2c57;
+    transition: all 0.3s;
+}
+.btn-outline-navy:hover {
+    background-color: #1b2c57;
+    color: white;
+}
 </style>

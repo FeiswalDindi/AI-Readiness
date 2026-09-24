@@ -273,6 +273,17 @@ export const store = reactive({
         .catch(e => console.error("Save Error:", e));
   },
 
+  async uploadImage(file, path) {
+      // Inline import to prevent loading storage SDK until needed
+      const { ref: storageRef, uploadBytes, getDownloadURL } = await import('firebase/storage');
+      const { storage } = await import('./firebase');
+      
+      const fileRef = storageRef(storage, `${path}/${Date.now()}_${file.name}`);
+      await uploadBytes(fileRef, file);
+      const url = await getDownloadURL(fileRef);
+      return url;
+  },
+
   addResource(resource) {
       if (!this.content.resources) this.content.resources = [];
       this.content.resources.unshift(resource);

@@ -15,6 +15,31 @@ if (!store.isAdmin) router.push('/');
 const draftContent = ref(JSON.parse(JSON.stringify(store.content)));
 const isLogsExpanded = ref(true);
 
+const uploadingState = ref({});
+const handleImageUpload = async (event, fieldName, isTeamMember = false, teamIndex = null) => {
+    const file = event.target.files[0];
+    if (!file) return;
+    
+    // Set loading state dynamically based on the field
+    const uploadKey = isTeamMember ? `team_${teamIndex}` : fieldName;
+    uploadingState.value[uploadKey] = true;
+    
+    try {
+        const url = await store.uploadImage(file, 'uploads');
+        if (isTeamMember) {
+            draftContent.value.team[teamIndex][fieldName] = url;
+        } else {
+            draftContent.value[fieldName] = url;
+        }
+    } catch (e) {
+        alert("Upload failed. Please ensure Firebase Storage rules allow writes.");
+        console.error(e);
+    } finally {
+        uploadingState.value[uploadKey] = false;
+        event.target.value = ''; // reset file input
+    }
+};
+
 const showReportModal = ref(false);
 const reportType = ref('daily');
 const reportDate = ref(new Date().toISOString().slice(0, 10));
@@ -181,11 +206,25 @@ const generateReport = () => {
               </div>
               <div class="col-md-3">
                   <label class="form-label small fw-bold text-muted text-uppercase ls-1">Poster Image URL</label>
-                  <input type="url" v-model="draftContent.posterUrl" class="form-control bg-light border-0 py-3" placeholder="https://example.com/poster.jpg">
+                  <div class="input-group">
+                      <input type="url" v-model="draftContent.posterUrl" class="form-control bg-light border-0 py-3" placeholder="https://example.com/poster.jpg">
+                      <input type="file" @change="e => handleImageUpload(e, 'posterUrl')" class="d-none" id="posterUpload" accept="image/*">
+                      <label for="posterUpload" class="input-group-text bg-white cursor-pointer fw-bold px-3">
+                          <span v-if="uploadingState.posterUrl" class="spinner-border spinner-border-sm" role="status"></span>
+                          <span v-else>Upload</span>
+                      </label>
+                  </div>
               </div>
               <div class="col-md-3">
                   <label class="form-label small fw-bold text-muted text-uppercase ls-1">Project Logo URL</label>
-                  <input type="url" v-model="draftContent.logoUrl" class="form-control bg-light border-0 py-3" placeholder="https://example.com/logo.jpg">
+                  <div class="input-group">
+                      <input type="url" v-model="draftContent.logoUrl" class="form-control bg-light border-0 py-3" placeholder="https://example.com/logo.jpg">
+                      <input type="file" @change="e => handleImageUpload(e, 'logoUrl')" class="d-none" id="logoUpload" accept="image/*">
+                      <label for="logoUpload" class="input-group-text bg-white cursor-pointer fw-bold px-3">
+                          <span v-if="uploadingState.logoUrl" class="spinner-border spinner-border-sm" role="status"></span>
+                          <span v-else>Upload</span>
+                      </label>
+                  </div>
               </div>
               <div class="col-md-3">
                   <label class="form-label small fw-bold text-muted text-uppercase ls-1">Phone Number</label>
@@ -232,7 +271,16 @@ const generateReport = () => {
                       <button @click="draftContent.team.splice(idx, 1)" class="btn btn-sm btn-danger position-absolute top-0 end-0 m-2 rounded-circle fw-bold" style="width:28px;height:28px;padding:0;">&times;</button>
                       <input type="text" v-model="member.name" class="form-control mb-2 fw-bold" placeholder="Name">
                       <input type="text" v-model="member.role" class="form-control mb-2" placeholder="Role">
-                      <input type="url" v-model="member.imageUrl" class="form-control mb-2" placeholder="Image URL">
+                      
+                      <div class="input-group mb-2">
+                          <input type="url" v-model="member.imageUrl" class="form-control" placeholder="Image URL">
+                          <input type="file" @change="e => handleImageUpload(e, 'imageUrl', true, idx)" class="d-none" :id="'teamUpload_'+idx" accept="image/*">
+                          <label :for="'teamUpload_'+idx" class="input-group-text bg-white cursor-pointer fw-bold px-3 m-0">
+                              <span v-if="uploadingState['team_'+idx]" class="spinner-border spinner-border-sm" role="status"></span>
+                              <span v-else>Upload</span>
+                          </label>
+                      </div>
+
                       <textarea v-model="member.description" class="form-control" rows="2" placeholder="Description"></textarea>
                   </div>
               </div>
