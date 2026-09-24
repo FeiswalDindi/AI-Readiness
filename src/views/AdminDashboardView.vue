@@ -60,6 +60,7 @@ watch(() => store.content, (newVal) => {
         if (!draftContent.value.heroSlides) draftContent.value.heroSlides = [];
         if (!draftContent.value.socialUpdates) draftContent.value.socialUpdates = [];
         if (!draftContent.value.about) draftContent.value.about = { title: '', text: '' };
+        if (!draftContent.value.team) draftContent.value.team = [];
     }
 }, { deep: true, immediate: true });
 
@@ -76,6 +77,14 @@ const saveSection = (fields) => {
     });
     store.saveContent();
     store.trackActivity("CMS Update", `Admin saved sections: ${fields.join(', ')}`);
+};
+
+const addTeamMember = () => {
+    if (!draftContent.value.team) draftContent.value.team = [];
+    draftContent.value.team = [
+        ...draftContent.value.team, 
+        { name: 'New Member', role: 'Role', location: 'Location', description: '', imageUrl: '' }
+    ];
 };
 
 const publishChanges = () => {
@@ -322,7 +331,7 @@ const generateReport = () => {
                 <transition name="fade">
                     <button v-if="isSectionDirty(['team'])" @click="saveSection(['team'])" class="btn btn-sm btn-success fw-bold px-3 rounded-pill">Save Team</button>
                 </transition>
-                <button @click="draftContent.team.push({ name: 'New Member', role: 'Role', location: 'Location', description: '', imageUrl: '' })" class="btn btn-sm btn-navy rounded-pill px-3 fw-bold">+ Add Member</button>
+                <button @click="addTeamMember" class="btn btn-sm btn-navy rounded-pill px-3 fw-bold">+ Add Member</button>
             </div>
           </div>
           <div class="row g-4">
