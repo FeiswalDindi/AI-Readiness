@@ -12,7 +12,7 @@ import {
 
 const USER_KEY = 'ra_user_session'; 
 const CONTENT_KEY = 'ra_site_content';
-const APP_VERSION = 'v2.8'; 
+const APP_VERSION = 'v2.9'; 
 
 // --- HELPERS ---
 const loadUser = () => {
@@ -27,7 +27,13 @@ const loadContent = () => {
     try {
         const saved = localStorage.getItem(CONTENT_KEY);
         if (!saved) return null;
-        return JSON.parse(saved).data;
+        const parsed = JSON.parse(saved);
+        // Force cache wipe if version mismatch to clear stale data
+        if (parsed.version !== APP_VERSION) {
+            localStorage.removeItem(CONTENT_KEY);
+            return null;
+        }
+        return parsed.data;
     } catch (e) { return null; }
 };
 
