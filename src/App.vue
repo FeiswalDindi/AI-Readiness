@@ -8,8 +8,20 @@ import CookieBanner from './components/CookieBanner.vue';
 import GoogleOneTap from './components/GoogleOneTap.vue';
 import LogoutModal from './components/LogoutModal.vue';
 import FloatingWhatsApp from './components/FloatingWhatsApp.vue';
-import { onMounted } from 'vue';
+import { onMounted, watch } from 'vue';
 import { store } from './store';
+
+watch(() => store.content.logoUrl, (newUrl) => {
+    if (newUrl) {
+        let link = document.querySelector("link[rel~='icon']");
+        if (!link) {
+            link = document.createElement('link');
+            link.rel = 'icon';
+            document.head.appendChild(link);
+        }
+        link.href = newUrl;
+    }
+}, { immediate: true });
 
 onMounted(async () => {
     if (store.user) {
@@ -60,3 +72,4 @@ onMounted(async () => {
   min-height: 100vh;
 }
 </style>
+
