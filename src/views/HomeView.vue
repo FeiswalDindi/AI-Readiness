@@ -104,7 +104,7 @@ onUnmounted(() => {
                     </transition>
                     
                     <div class="d-flex flex-column flex-sm-row gap-3 mt-4 animate-buttons w-100">
-                        <button v-if="!store.userProfile?.surveyCompleted" @click="handleSurveyClick" class="btn btn-gold btn-lg px-4 py-3 rounded-pill fw-bold shadow-lg border-0">
+                        <button v-if="!store.userProfile?.surveyCompleted" @click="store.startSurveyFlow()" class="btn btn-gold btn-lg px-4 py-3 rounded-pill fw-bold shadow-lg border-0">
                             Take Pilot Survey
                         </button>
                         <a :href="store.content.whatsappLink" target="_blank" class="btn btn-outline-light btn-lg px-4 py-3 rounded-pill fw-bold d-flex align-items-center justify-content-center gap-2">

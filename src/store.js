@@ -191,6 +191,16 @@ export const store = reactive({
       }
   },
 
+  startSurveyFlow() {
+      if (this.user) {
+          localStorage.setItem('pending_survey_verification', 'true');
+          window.open(this.content.qualtricsLink, '_blank');
+      } else {
+          this.intent = 'survey';
+          this.isLoginModalOpen = true;
+      }
+  },
+
   async markSurveyCompleted() {
       if (!this.user || this.isAdmin) return;
       this.userProfile.surveyCompleted = true;

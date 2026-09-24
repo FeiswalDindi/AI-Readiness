@@ -33,6 +33,7 @@ const handleRedirect = async () => {
     store.closeModal();
     if (store.intent === 'survey') {
         store.intent = null;
+        localStorage.setItem('pending_survey_verification', 'true');
         window.open(store.content.qualtricsLink, '_blank');
         router.push('/dashboard');
     } else if (store.intent === 'record_survey') {

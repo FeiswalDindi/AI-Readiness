@@ -25,9 +25,9 @@ const handleAdminClick = () => {
           <p class="text-white-50 mb-4" style="max-width: 600px; margin: 0 auto;">
               Complete the pilot survey to earn 20 KES airtime and join the movement.
           </p>
-          <a :href="store.content.qualtricsLink" target="_blank" class="btn btn-gold rounded-pill px-5 py-3 fw-bold shadow-lg hover-scale">
+          <button @click="store.startSurveyFlow()" class="btn btn-gold rounded-pill px-5 py-3 fw-bold shadow-lg hover-scale">
               Take Pilot Survey
-          </a>
+          </button>
       </div>
 
       <div class="row g-4 mt-2">

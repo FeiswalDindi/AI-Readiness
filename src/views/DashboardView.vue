@@ -61,12 +61,7 @@ const formatDate = (d) => {
 // --- SMART SURVEY VERIFICATION ---
 const showVerificationModal = ref(false);
 
-const handleSurveyClick = (url) => {
-    // 1. Mark in localStorage that they left to take the survey
-    localStorage.setItem('pending_survey_verification', 'true');
-    // 2. Open survey in new tab
-    window.open(url, '_blank');
-};
+
 
 const checkPendingVerification = () => {
     // If they already completed it officially, just clear the flag
@@ -126,7 +121,7 @@ onMounted(() => {
         </div>
         
         <div class="d-flex align-items-center gap-3">
-             <button v-if="!store.userProfile?.surveyCompleted" @click="handleSurveyClick(store.content.qualtricsLink)" class="btn btn-gold rounded-0 px-4 py-2 fw-bold shadow-sm text-navy d-none d-md-block">
+             <button v-if="!store.userProfile?.surveyCompleted" @click="store.startSurveyFlow()" class="btn btn-gold rounded-0 px-4 py-2 fw-bold shadow-sm text-navy d-none d-md-block">
                  Take Pilot Survey
              </button>
              <div class="user-pill bg-white px-3 py-2 rounded-0 shadow-sm border border-light d-flex align-items-center gap-2">
@@ -182,7 +177,7 @@ onMounted(() => {
                               <span class="fw-bold d-block mb-1">{{ survey.title }}</span>
                               <small class="text-white-50">⏱ Est: {{ survey.estTime }} • {{ survey.date }}</small>
                           </div>
-                          <button v-if="survey.status === 'Action Required'" @click="handleSurveyClick(survey.actionUrl)" class="btn btn-gold btn-sm rounded-0 px-4 fw-bold shadow-sm text-navy">
+                          <button v-if="survey.status === 'Action Required'" @click="store.startSurveyFlow()" class="btn btn-gold btn-sm rounded-0 px-4 fw-bold shadow-sm text-navy">
                               Take Survey
                           </button>
                           <button v-else disabled class="btn btn-outline-light btn-sm rounded-0 px-4 fw-bold opacity-50">
