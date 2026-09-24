@@ -174,7 +174,7 @@ onUnmounted(() => {
     </header>
 
     <!-- MISSION / VISION -->
-    <section class="py-5 bg-white">
+    <section id="mission" class="py-5 bg-white">
         <div class="container py-4">
             <div class="mission-vision-wrapper" v-scroll-reveal="{ delay: 100 }">
                 

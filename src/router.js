@@ -74,8 +74,10 @@ const router = createRouter({
     scrollBehavior(to, from, savedPosition) {
         if (savedPosition) {
             return savedPosition; // Use browser back button position
+        } else if (to.hash) {
+            return { el: to.hash, behavior: 'smooth' };
         } else {
-            return { top: 0, behavior: 'smooth' }; // Scroll to top instantly
+            return { top: 0, behavior: 'smooth' }; // Scroll to top smoothly
         }
     }
 });

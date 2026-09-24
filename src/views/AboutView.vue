@@ -81,7 +81,7 @@ const closeMemberModal = () => {
     </section>
 
     <!-- RESEARCH ADMINISTRATORS -->
-    <section class="py-5 bg-light-navy border-top">
+    <section id="leadership" class="py-5 bg-light-navy border-top">
         <div class="container py-5 text-center">
             <h6 class="text-gold fw-bold ls-2 mb-2 text-uppercase">The People Behind The Project</h6>
             <h2 class="fw-bold text-navy mb-5 display-6">Our Research Team</h2>
