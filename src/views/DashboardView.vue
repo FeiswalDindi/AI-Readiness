@@ -6,14 +6,20 @@ import { useRouter } from 'vue-router';
 const router = useRouter();
 const user = computed(() => store.user);
 
-// --- MOCK SURVEY DATA ---
-const surveys = ref({
-    completed: [
-        { id: 1, title: 'AI Pilot Questionnaire', date: 'Oct 15, 2026', points: '20 KES', status: 'Verified' }
-    ],
-    upcoming: [
-        { id: 2, title: 'Main AI Readiness Assessment', date: 'Available Dec 1st', estTime: '15 mins', status: 'Locked' }
-    ]
+// --- SURVEY DATA ---
+const surveys = computed(() => {
+    const completed = [];
+    const upcoming = [];
+    
+    if (store.userProfile && store.userProfile.surveyCompleted) {
+        completed.push({ id: 1, title: 'AI Pilot Questionnaire', date: 'Recently Completed', points: 'Participant', status: 'Verified' });
+        upcoming.push({ id: 2, title: 'Main AI Readiness Assessment', date: 'Available Dec 1st', estTime: '15 mins', status: 'Locked' });
+    } else {
+        upcoming.push({ id: 1, title: 'AI Pilot Questionnaire', date: 'Available Now', estTime: '5 mins', status: 'Action Required', actionUrl: store.content.qualtricsLink });
+        upcoming.push({ id: 2, title: 'Main AI Readiness Assessment', date: 'Available Dec 1st', estTime: '15 mins', status: 'Locked' });
+    }
+    
+    return { completed, upcoming };
 });
 
 // --- LIVE NEWS LOGIC ---
@@ -131,7 +137,10 @@ const formatDate = (d) => {
                               <span class="fw-bold d-block mb-1">{{ survey.title }}</span>
                               <small class="text-white-50">⏱ Est: {{ survey.estTime }} • {{ survey.date }}</small>
                           </div>
-                          <button disabled class="btn btn-outline-light btn-sm rounded-pill px-4 fw-bold opacity-50">
+                          <a v-if="survey.status === 'Action Required'" :href="survey.actionUrl" target="_blank" class="btn btn-gold btn-sm rounded-pill px-4 fw-bold shadow-sm text-navy">
+                              Take Survey
+                          </a>
+                          <button v-else disabled class="btn btn-outline-light btn-sm rounded-pill px-4 fw-bold opacity-50">
                               <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="me-1 mb-1" viewBox="0 0 16 16"><path d="M8 1a2 2 0 0 1 2 2v4H6V3a2 2 0 0 1 2-2zm3 6V3a3 3 0 0 0-6 0v4a2 2 0 0 0-2 2v5a2 2 0 0 0 2 2h6a2 2 0 0 0 2-2V9a2 2 0 0 0-2-2z"/></svg>
                               Locked
                           </button>

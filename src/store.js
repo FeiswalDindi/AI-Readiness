@@ -1,7 +1,7 @@
 import { reactive } from 'vue';
 import { db, auth } from './firebase'; 
 import { 
-    doc, setDoc, onSnapshot, collection, addDoc, serverTimestamp, query, orderBy, limit 
+    doc, setDoc, getDoc, onSnapshot, collection, addDoc, serverTimestamp, query, orderBy, limit 
 } from 'firebase/firestore'; 
 import { 
     createUserWithEmailAndPassword, 
@@ -45,6 +45,8 @@ export const store = reactive({
   isLoginModalOpen: false,
   isLogoutModalOpen: false,
   isAdmin: savedUser?.role === 'admin', 
+  intent: null,
+  userProfile: { surveyCompleted: false },
   
   activityLogs: [],
   isLoadingLogs: true,
@@ -163,6 +165,34 @@ export const store = reactive({
       }
   },
 
+  // --- USER PROFILE & SURVEY TRACKING ---
+  async syncUserProfile() {
+      if (!this.user || this.isAdmin) return;
+      try {
+          const docRef = doc(db, "participants", this.user.uid);
+          const snap = await getDoc(docRef);
+          if (snap.exists()) {
+              this.userProfile = snap.data();
+          } else {
+              this.userProfile = { surveyCompleted: false, joined: new Date().toISOString() };
+              await setDoc(docRef, this.userProfile);
+          }
+      } catch (e) {
+          console.error("Profile Sync Error", e);
+      }
+  },
+
+  async markSurveyCompleted() {
+      if (!this.user || this.isAdmin) return;
+      this.userProfile.surveyCompleted = true;
+      try {
+          await setDoc(doc(db, "participants", this.user.uid), { surveyCompleted: true }, { merge: true });
+          this.trackActivity("Survey Completed", "Participant completed the main survey.");
+      } catch (e) {
+          console.error("Survey Mark Error", e);
+      }
+  },
+
   // --- AUTHENTICATION ---
 
   async login(email, password) {
@@ -212,6 +242,7 @@ export const store = reactive({
         this.user = loggedInUser;
         sessionStorage.setItem('ra_session_active', 'true'); // <-- SET SESSION ACTIVE
         localStorage.setItem(USER_KEY, JSON.stringify(loggedInUser));
+        await this.syncUserProfile();
         this.trackActivity("Login", `User logged in: ${loggedInUser.email}`);
         return true;
     }
@@ -231,6 +262,7 @@ export const store = reactive({
     this.isAdmin = false;
     sessionStorage.setItem('ra_session_active', 'true');
     localStorage.setItem(USER_KEY, JSON.stringify(loggedInUser));
+    await this.syncUserProfile();
     this.trackActivity("Login", `User logged in via Google: ${loggedInUser.email}`);
     return true;
   },
@@ -263,6 +295,8 @@ export const store = reactive({
           
           sessionStorage.setItem('ra_session_active', 'true'); // <-- SET SESSION ACTIVE
           localStorage.setItem(USER_KEY, JSON.stringify(this.user));
+          
+          await this.syncUserProfile();
           
           this.trackActivity("Sign Up", "New Account Created via Portal");
           return true;

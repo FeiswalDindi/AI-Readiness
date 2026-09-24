@@ -22,6 +22,22 @@ const isLoading = ref(false);
 const showPassword = ref(false);
 const showConfirmPassword = ref(false);
 
+const handleRedirect = async () => {
+    store.closeModal();
+    if (store.intent === 'survey') {
+        store.intent = null;
+        window.open(store.content.qualtricsLink, '_blank');
+        router.push('/dashboard');
+    } else if (store.intent === 'record_survey') {
+        store.intent = null;
+        await store.markSurveyCompleted();
+        router.push('/dashboard');
+    } else {
+        if (store.isAdmin) router.push('/admin');
+        else router.push('/dashboard');
+    }
+};
+
 const handleSubmit = async () => {
     errorMessage.value = '';
     isLoading.value = true;
@@ -31,8 +47,7 @@ const handleSubmit = async () => {
             // --- LOGIN LOGIC ---
             const success = await store.login(email.value, password.value);
             if (success) {
-                store.closeModal();
-                if (store.isAdmin) router.push('/admin');
+                await handleRedirect();
             } else {
                 errorMessage.value = "Invalid email or password.";
             }
@@ -62,8 +77,7 @@ const handleSubmit = async () => {
 
             const success = await store.signup(name.value, email.value, password.value);
             if (success) {
-                store.closeModal();
-                router.push('/'); 
+                await handleRedirect();
             }
         }
     } catch (e) {
@@ -78,8 +92,7 @@ const handleGoogle = async () => {
   try {
     const result = await signInWithPopup(auth, googleProvider);
     await store.googleLogin(result.user);
-    store.closeModal();
-    router.push('/dashboard');
+    await handleRedirect();
   } catch (error) {
     errorMessage.value = `Google sign-in failed: ${error.message}`;
   }
@@ -100,10 +113,25 @@ const toggleMode = () => {
       <button class="close-btn" @click="store.closeModal()">×</button>
       
       <div class="text-center mb-4">
-        <h3 class="fw-bold text-white">{{ isLogin ? 'Welcome Back' : 'Join the Future' }}</h3>
-        <p class="text-white-50 small">
-            {{ isLogin ? 'Access your dashboard securely.' : 'Create an account to get started.' }}
-        </p>
+        <template v-if="store.intent === 'survey'">
+            <h3 class="fw-bold text-white">Take the Pilot Survey</h3>
+            <p class="text-white-50 small">
+                Sign in to start the survey. This helps us track your progress and send future research updates. 
+                <br><strong class="text-gold mt-1 d-block">Your data remains 100% strictly private.</strong>
+            </p>
+        </template>
+        <template v-else-if="store.intent === 'record_survey'">
+            <h3 class="fw-bold text-white">Record Your Progress</h3>
+            <p class="text-white-50 small">
+                Sign in so we can mark your survey as completed on your dashboard!
+            </p>
+        </template>
+        <template v-else>
+            <h3 class="fw-bold text-white">{{ isLogin ? 'Welcome Back' : 'Join the Future' }}</h3>
+            <p class="text-white-50 small">
+                {{ isLogin ? 'Access your dashboard securely.' : 'Create an account to get started.' }}
+            </p>
+        </template>
       </div>
 
       <button @click="handleGoogle" class="social-btn google mb-3">
