@@ -1,5 +1,5 @@
 <script setup>
-import { ref, watch, onMounted } from 'vue';
+import { ref, watch, onMounted, computed } from 'vue';
 import { store } from '../store';
 import { useRouter } from 'vue-router';
 
@@ -16,16 +16,19 @@ const draftContent = ref(JSON.parse(JSON.stringify(store.content)));
 const isLogsExpanded = ref(true);
 
 const uploadingState = ref({});
+const uploadProgress = ref({});
 const handleImageUpload = async (event, fieldName, isTeamMember = false, teamIndex = null) => {
     const file = event.target.files[0];
     if (!file) return;
     
-    // Set loading state dynamically based on the field
     const uploadKey = isTeamMember ? `team_${teamIndex}` : fieldName;
     uploadingState.value[uploadKey] = true;
+    uploadProgress.value[uploadKey] = 0;
     
     try {
-        const url = await store.uploadImage(file, 'uploads');
+        const url = await store.uploadImage(file, 'uploads', (prog) => {
+            uploadProgress.value[uploadKey] = Math.round(prog);
+        });
         if (isTeamMember) {
             draftContent.value.team[teamIndex][fieldName] = url;
         } else {
@@ -36,6 +39,7 @@ const handleImageUpload = async (event, fieldName, isTeamMember = false, teamInd
         console.error(e);
     } finally {
         uploadingState.value[uploadKey] = false;
+        uploadProgress.value[uploadKey] = 0;
         event.target.value = ''; // reset file input
     }
 };
@@ -57,11 +61,26 @@ watch(() => store.content, (newVal) => {
     }
 }, { deep: true, immediate: true });
 
+// --- SMART SAVE LOGIC ---
+const isDirty = computed(() => JSON.stringify(draftContent.value) !== JSON.stringify(store.content));
+
+const isSectionDirty = (fields) => {
+    return fields.some(field => JSON.stringify(draftContent.value[field]) !== JSON.stringify(store.content[field]));
+};
+
+const saveSection = (fields) => {
+    fields.forEach(field => {
+        store.content[field] = JSON.parse(JSON.stringify(draftContent.value[field]));
+    });
+    store.saveContent();
+    store.trackActivity("CMS Update", `Admin saved sections: ${fields.join(', ')}`);
+};
+
 const publishChanges = () => {
     store.content = JSON.parse(JSON.stringify(draftContent.value));
     store.saveContent();
     store.trackActivity("CMS Update", "Admin published global content changes");
-    alert("✅ Changes Published Live!");
+    alert("✅ All Changes Published Live!");
 };
 
 const discardChanges = () => {
@@ -148,8 +167,13 @@ const generateReport = () => {
                   <span>Export Reports</span>
               </button>
               <div class="vr mx-2 text-muted opacity-25 d-none d-md-block"></div>
-              <button @click="discardChanges" class="btn btn-outline-danger rounded-pill px-4 btn-sm d-flex align-items-center gap-2 fw-bold hover-lift">Discard</button>
-              <button @click="publishChanges" class="btn btn-navy rounded-pill fw-bold px-4 py-2 d-flex align-items-center gap-2 shadow-sm hover-lift">Publish All</button>
+              
+              <transition name="fade">
+                  <div v-if="isDirty" class="d-flex gap-3">
+                      <button @click="discardChanges" class="btn btn-outline-danger rounded-pill px-4 btn-sm d-flex align-items-center gap-2 fw-bold hover-lift">Discard</button>
+                      <button @click="publishChanges" class="btn btn-navy rounded-pill fw-bold px-4 py-2 d-flex align-items-center gap-2 shadow-sm hover-lift pulse-btn">Publish All Changes</button>
+                  </div>
+              </transition>
           </div>
       </div>
 
@@ -194,11 +218,16 @@ const generateReport = () => {
       <hr class="my-5 text-muted opacity-25">
 
       <!-- SURVEY & PROJECT SETTINGS -->
-      <div class="card border-0 shadow-sm p-4 bg-white mb-5 rounded-4">
-          <h5 class="fw-bold text-navy mb-4 d-flex align-items-center gap-2">
-              <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" fill="currentColor" class="text-gold" viewBox="0 0 16 16"><path d="M8.5 5.5a.5.5 0 0 0-1 0v3.362l-1.429 2.38a.5.5 0 1 0 .858.515l1.5-2.5A.5.5 0 0 0 8.5 9z"/><path d="M6.5 0a.5.5 0 0 0 0 1H7v1.07a7.001 7.001 0 0 0-3.273 12.474l-.602.602a.5.5 0 0 0 .707.708l.746-.746A6.97 6.97 0 0 0 8 16a6.97 6.97 0 0 0 3.422-.892l.746.746a.5.5 0 0 0 .707-.708l-.601-.602A7.001 7.001 0 0 0 9 2.07V1h.5a.5.5 0 0 0 0-1zm1.038 3.018a6 6 0 0 1 .924 0 6 6 0 1 1-.924 0M0 3.5c0 .753.333 1.429.86 1.887A8.035 8.035 0 0 1 4.387 1.86 2.5 2.5 0 0 0 0 3.5M13.5 1c-.753 0-1.429.333-1.887.86a8.035 8.035 0 0 1 3.527 3.527A2.5 2.5 0 0 0 13.5 1"/></svg>
-              Project & Survey Settings
-          </h5>
+      <div class="card border-0 shadow-sm p-4 bg-white mb-5 rounded-4 position-relative">
+          <div class="d-flex justify-content-between align-items-center mb-4">
+              <h5 class="fw-bold text-navy mb-0 d-flex align-items-center gap-2">
+                  <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" fill="currentColor" class="text-gold" viewBox="0 0 16 16"><path d="M8.5 5.5a.5.5 0 0 0-1 0v3.362l-1.429 2.38a.5.5 0 1 0 .858.515l1.5-2.5A.5.5 0 0 0 8.5 9z"/><path d="M6.5 0a.5.5 0 0 0 0 1H7v1.07a7.001 7.001 0 0 0-3.273 12.474l-.602.602a.5.5 0 0 0 .707.708l.746-.746A6.97 6.97 0 0 0 8 16a6.97 6.97 0 0 0 3.422-.892l.746.746a.5.5 0 0 0 .707-.708l-.601-.602A7.001 7.001 0 0 0 9 2.07V1h.5a.5.5 0 0 0 0-1zm1.038 3.018a6 6 0 0 1 .924 0 6 6 0 1 1-.924 0M0 3.5c0 .753.333 1.429.86 1.887A8.035 8.035 0 0 1 4.387 1.86 2.5 2.5 0 0 0 0 3.5M13.5 1c-.753 0-1.429.333-1.887.86a8.035 8.035 0 0 1 3.527 3.527A2.5 2.5 0 0 0 13.5 1"/></svg>
+                  Project & Survey Settings
+              </h5>
+              <transition name="fade">
+                  <button v-if="isSectionDirty(['countdownDate', 'posterUrl', 'logoUrl', 'phoneNumber'])" @click="saveSection(['countdownDate', 'posterUrl', 'logoUrl', 'phoneNumber'])" class="btn btn-sm btn-success fw-bold px-3 rounded-pill">Save Settings</button>
+              </transition>
+          </div>
           <div class="row g-4">
               <div class="col-md-3">
                   <label class="form-label small fw-bold text-muted text-uppercase ls-1">Main Survey Date</label>
@@ -209,8 +238,9 @@ const generateReport = () => {
                   <div class="input-group">
                       <input type="url" v-model="draftContent.posterUrl" class="form-control bg-light border-0 py-3" placeholder="https://example.com/poster.jpg">
                       <input type="file" @change="e => handleImageUpload(e, 'posterUrl')" class="d-none" id="posterUpload" accept="image/*">
-                      <label for="posterUpload" class="input-group-text bg-white cursor-pointer fw-bold px-3">
-                          <span v-if="uploadingState.posterUrl" class="spinner-border spinner-border-sm" role="status"></span>
+                      <label for="posterUpload" class="input-group-text bg-white cursor-pointer fw-bold px-3 position-relative overflow-hidden">
+                          <div v-if="uploadingState.posterUrl" class="position-absolute top-0 start-0 h-100 bg-success opacity-25" :style="{ width: uploadProgress.posterUrl + '%' }"></div>
+                          <span v-if="uploadingState.posterUrl" class="position-relative z-2 small">{{ uploadProgress.posterUrl }}%</span>
                           <span v-else>Upload</span>
                       </label>
                   </div>
@@ -220,8 +250,9 @@ const generateReport = () => {
                   <div class="input-group">
                       <input type="url" v-model="draftContent.logoUrl" class="form-control bg-light border-0 py-3" placeholder="https://example.com/logo.jpg">
                       <input type="file" @change="e => handleImageUpload(e, 'logoUrl')" class="d-none" id="logoUpload" accept="image/*">
-                      <label for="logoUpload" class="input-group-text bg-white cursor-pointer fw-bold px-3">
-                          <span v-if="uploadingState.logoUrl" class="spinner-border spinner-border-sm" role="status"></span>
+                      <label for="logoUpload" class="input-group-text bg-white cursor-pointer fw-bold px-3 position-relative overflow-hidden">
+                          <div v-if="uploadingState.logoUrl" class="position-absolute top-0 start-0 h-100 bg-success opacity-25" :style="{ width: uploadProgress.logoUrl + '%' }"></div>
+                          <span v-if="uploadingState.logoUrl" class="position-relative z-2 small">{{ uploadProgress.logoUrl }}%</span>
                           <span v-else>Upload</span>
                       </label>
                   </div>
@@ -233,20 +264,42 @@ const generateReport = () => {
           </div>
       </div>
 
-      <AdminHeroEditor :slides="draftContent.heroSlides" />
+      <div class="position-relative mb-5">
+          <div class="d-flex justify-content-end mb-2">
+              <transition name="fade">
+                  <button v-if="isSectionDirty(['heroSlides'])" @click="saveSection(['heroSlides'])" class="btn btn-sm btn-success fw-bold px-3 rounded-pill" style="z-index: 10;">Save Slider</button>
+              </transition>
+          </div>
+          <AdminHeroEditor :slides="draftContent.heroSlides" />
+      </div>
 
       <div class="row g-4 mb-5">
-          <div class="col-12">
+          <div class="col-12 position-relative">
+              <div class="d-flex justify-content-end position-absolute top-0 end-0 m-3" style="z-index: 10;">
+                  <transition name="fade">
+                      <button v-if="isSectionDirty(['about'])" @click="saveSection(['about'])" class="btn btn-sm btn-success fw-bold px-3 rounded-pill">Save About</button>
+                  </transition>
+              </div>
               <AdminAboutEditor :aboutData="draftContent.about" />
           </div>
-          <div class="col-12">
+          <div class="col-12 position-relative">
+              <div class="d-flex justify-content-end position-absolute top-0 end-0 m-3" style="z-index: 10;">
+                  <transition name="fade">
+                      <button v-if="isSectionDirty(['socialUpdates'])" @click="saveSection(['socialUpdates'])" class="btn btn-sm btn-success fw-bold px-3 rounded-pill">Save Socials</button>
+                  </transition>
+              </div>
               <AdminSocialsEditor :socials="draftContent.socialUpdates" />
           </div>
       </div>
 
       <!-- MISSION & VISION SETTINGS -->
       <div class="card border-0 shadow-sm p-4 bg-white mb-5 rounded-4">
-          <h5 class="fw-bold text-navy mb-4 d-flex align-items-center gap-2">Mission & Vision</h5>
+          <div class="d-flex justify-content-between align-items-center mb-4">
+              <h5 class="fw-bold text-navy mb-0 d-flex align-items-center gap-2">Mission & Vision</h5>
+              <transition name="fade">
+                  <button v-if="isSectionDirty(['mission', 'vision'])" @click="saveSection(['mission', 'vision'])" class="btn btn-sm btn-success fw-bold px-3 rounded-pill">Save Statements</button>
+              </transition>
+          </div>
           <div class="row g-4">
               <div class="col-md-6">
                   <label class="form-label small fw-bold text-muted text-uppercase ls-1">Mission Statement</label>
@@ -263,7 +316,12 @@ const generateReport = () => {
       <div class="card border-0 shadow-sm p-4 bg-white mb-5 rounded-4">
           <div class="d-flex justify-content-between align-items-center mb-4">
             <h5 class="fw-bold text-navy mb-0">Team Members</h5>
-            <button @click="draftContent.team.push({ name: 'New Member', role: 'Role', location: 'Location', description: '', imageUrl: '' })" class="btn btn-sm btn-navy rounded-pill px-3 fw-bold">+ Add Member</button>
+            <div class="d-flex gap-2">
+                <transition name="fade">
+                    <button v-if="isSectionDirty(['team'])" @click="saveSection(['team'])" class="btn btn-sm btn-success fw-bold px-3 rounded-pill">Save Team</button>
+                </transition>
+                <button @click="draftContent.team.push({ name: 'New Member', role: 'Role', location: 'Location', description: '', imageUrl: '' })" class="btn btn-sm btn-navy rounded-pill px-3 fw-bold">+ Add Member</button>
+            </div>
           </div>
           <div class="row g-4">
               <div v-for="(member, idx) in draftContent.team" :key="idx" class="col-md-6">
@@ -275,8 +333,9 @@ const generateReport = () => {
                       <div class="input-group mb-2">
                           <input type="url" v-model="member.imageUrl" class="form-control" placeholder="Image URL">
                           <input type="file" @change="e => handleImageUpload(e, 'imageUrl', true, idx)" class="d-none" :id="'teamUpload_'+idx" accept="image/*">
-                          <label :for="'teamUpload_'+idx" class="input-group-text bg-white cursor-pointer fw-bold px-3 m-0">
-                              <span v-if="uploadingState['team_'+idx]" class="spinner-border spinner-border-sm" role="status"></span>
+                          <label :for="'teamUpload_'+idx" class="input-group-text bg-white cursor-pointer fw-bold px-3 m-0 position-relative overflow-hidden">
+                              <div v-if="uploadingState['team_'+idx]" class="position-absolute top-0 start-0 h-100 bg-success opacity-25" :style="{ width: uploadProgress['team_'+idx] + '%' }"></div>
+                              <span v-if="uploadingState['team_'+idx]" class="position-relative z-2 small">{{ uploadProgress['team_'+idx] }}%</span>
                               <span v-else>Upload</span>
                           </label>
                       </div>
@@ -341,4 +400,13 @@ const generateReport = () => {
     background: rgba(27, 44, 87, 0.4); backdrop-filter: blur(5px); z-index: 1050;
 }
 @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+
+@keyframes pulseSave {
+    0% { box-shadow: 0 0 0 0 rgba(27, 44, 87, 0.4); }
+    70% { box-shadow: 0 0 0 10px rgba(27, 44, 87, 0); }
+    100% { box-shadow: 0 0 0 0 rgba(27, 44, 87, 0); }
+}
+.pulse-btn {
+    animation: pulseSave 2s infinite;
+}
 </style>

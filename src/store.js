@@ -273,15 +273,26 @@ export const store = reactive({
         .catch(e => console.error("Save Error:", e));
   },
 
-  async uploadImage(file, path) {
-      // Inline import to prevent loading storage SDK until needed
-      const { ref: storageRef, uploadBytes, getDownloadURL } = await import('firebase/storage');
+  async uploadImage(file, path, onProgress) {
+      const { ref: storageRef, uploadBytesResumable, getDownloadURL } = await import('firebase/storage');
       const { storage } = await import('./firebase');
       
       const fileRef = storageRef(storage, `${path}/${Date.now()}_${file.name}`);
-      await uploadBytes(fileRef, file);
-      const url = await getDownloadURL(fileRef);
-      return url;
+      const uploadTask = uploadBytesResumable(fileRef, file);
+
+      return new Promise((resolve, reject) => {
+          uploadTask.on('state_changed', 
+              (snapshot) => {
+                  const progress = (snapshot.bytesTransferred / snapshot.totalBytes) * 100;
+                  if (onProgress) onProgress(progress);
+              }, 
+              (error) => reject(error), 
+              async () => {
+                  const url = await getDownloadURL(uploadTask.snapshot.ref);
+                  resolve(url);
+              }
+          );
+      });
   },
 
   addResource(resource) {
