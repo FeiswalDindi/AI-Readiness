@@ -114,9 +114,9 @@ const closeMemberModal = () => {
                     <h6 class="text-gold fw-bold text-uppercase ls-1 mb-4">{{ selectedMember.role }}</h6>
                     
                     <div class="bg-light-navy p-4 rounded-4 text-start border position-relative overflow-hidden">
-                        <svg class="position-absolute opacity-10" style="top:-20px; right:-20px" xmlns="http://www.w3.org/2000/svg" width="120" height="120" fill="#1b2c57" viewBox="0 0 16 16"><path d="M8 15A7 7 0 1 1 8 1a7 7 0 0 1 0 14m0 1A8 8 0 1 0 8 0a8 8 0 0 0 0 16"/></svg>
-                        <h6 class="fw-bold text-navy mb-3"><i class="bi bi-person-lines-fill me-2 text-gold"></i>About</h6>
-                        <p class="text-muted mb-0 lh-lg" style="white-space: pre-wrap;">{{ selectedMember.description || "No description provided." }}</p>
+                        <svg class="position-absolute" style="top:-20px; right:-20px; opacity: 0.04; pointer-events: none;" xmlns="http://www.w3.org/2000/svg" width="120" height="120" fill="#1b2c57" viewBox="0 0 16 16"><path d="M8 15A7 7 0 1 1 8 1a7 7 0 0 1 0 14m0 1A8 8 0 1 0 8 0a8 8 0 0 0 0 16"/></svg>
+                        <h6 class="fw-bold text-navy mb-3 position-relative z-2"><i class="bi bi-person-lines-fill me-2 text-gold"></i>About</h6>
+                        <p class="text-muted mb-0 lh-lg position-relative z-2" style="white-space: pre-wrap;">{{ selectedMember.description || "No description provided." }}</p>
                     </div>
                 </div>
                 
