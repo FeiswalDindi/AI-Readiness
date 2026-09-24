@@ -105,22 +105,21 @@ const closeMemberModal = () => {
     <!-- TEAM MEMBER MODAL -->
     <transition name="fade">
         <div v-if="selectedMember" class="modal-overlay" @click.self="closeMemberModal">
-            <div class="glass-card bg-white position-relative shadow-lg border-0">
-                <button class="close-btn text-navy shadow-sm border" @click="closeMemberModal">×</button>
+            <div class="glass-card bg-white position-relative shadow-lg border-0 rounded-0" style="border-radius: 0 !important;">
+                <button class="close-btn text-navy shadow-sm border rounded-0" style="border-radius: 0 !important;" @click="closeMemberModal">×</button>
                 
                 <div class="text-center mb-4">
-                    <img :src="selectedMember.imageUrl || `https://ui-avatars.com/api/?name=${encodeURIComponent(selectedMember.name)}&background=1b2c57&color=fff&size=128`" class="rounded-circle shadow-lg mb-3 border border-4 border-white" style="width: 150px; height: 150px; object-fit: cover; margin-top: -80px;">
+                    <img :src="selectedMember.imageUrl || `https://ui-avatars.com/api/?name=${encodeURIComponent(selectedMember.name)}&background=1b2c57&color=fff&size=128`" class="rounded-0 shadow-lg mb-3 border border-4 border-white" style="width: 150px; height: 150px; object-fit: cover; margin-top: -80px;">
                     <h3 class="fw-bold text-navy mb-1">{{ selectedMember.name }}</h3>
                     <h6 class="text-gold fw-bold text-uppercase ls-1 mb-4">{{ selectedMember.role }}</h6>
                     
-                    <div class="bg-light-navy p-4 rounded-4 text-start border position-relative overflow-hidden">
+                    <div class="bg-light-navy p-4 rounded-0 text-start border position-relative overflow-hidden">
                         <svg class="position-absolute" style="top:-20px; right:-20px; opacity: 0.04; pointer-events: none;" xmlns="http://www.w3.org/2000/svg" width="120" height="120" fill="#1b2c57" viewBox="0 0 16 16"><path d="M8 15A7 7 0 1 1 8 1a7 7 0 0 1 0 14m0 1A8 8 0 1 0 8 0a8 8 0 0 0 0 16"/></svg>
-                        <h6 class="fw-bold text-navy mb-3 position-relative z-2"><i class="bi bi-person-lines-fill me-2 text-gold"></i>About</h6>
                         <p class="text-muted mb-0 lh-lg position-relative z-2" style="white-space: pre-wrap;">{{ selectedMember.description || "No description provided." }}</p>
                     </div>
                 </div>
                 
-                <button @click="closeMemberModal" class="btn btn-navy w-100 rounded-pill py-3 fw-bold mt-2">Close Profile</button>
+                <button @click="closeMemberModal" class="btn btn-navy w-100 rounded-0 py-3 fw-bold mt-2">Close Profile</button>
             </div>
         </div>
     </transition>

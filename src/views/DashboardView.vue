@@ -52,21 +52,63 @@ const fetchDashboardNews = async () => {
     }
 };
 
-onMounted(() => {
-    window.scrollTo(0, 0);
-    if (!store.user) {
-        router.push('/');
-    }
-    fetchDashboardNews();
-});
-
-const handleLogout = () => { store.isLogoutModalOpen = true; };
-
 const formatDate = (d) => {
    if(!d) return '';
    const date = new Date(d);
    return date.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
 };
+
+// --- SMART SURVEY VERIFICATION ---
+const showVerificationModal = ref(false);
+
+const handleSurveyClick = (url) => {
+    // 1. Mark in localStorage that they left to take the survey
+    localStorage.setItem('pending_survey_verification', 'true');
+    // 2. Open survey in new tab
+    window.open(url, '_blank');
+};
+
+const checkPendingVerification = () => {
+    // If they already completed it officially, just clear the flag
+    if (store.userProfile?.surveyCompleted) {
+        localStorage.removeItem('pending_survey_verification');
+        return;
+    }
+    
+    // If flag exists, ask them if they finished
+    if (localStorage.getItem('pending_survey_verification') === 'true') {
+        showVerificationModal.value = true;
+    }
+};
+
+const confirmSurveyCompleted = async () => {
+    await store.markSurveyCompleted();
+    localStorage.removeItem('pending_survey_verification');
+    showVerificationModal.value = false;
+};
+
+const declineSurveyCompleted = () => {
+    localStorage.removeItem('pending_survey_verification');
+    showVerificationModal.value = false;
+};
+
+const handleLogout = () => { store.isLogoutModalOpen = true; };
+
+onMounted(() => {
+    window.scrollTo(0, 0);
+    if (!store.user) {
+        router.push('/');
+    } else {
+        // We add a slight delay so it feels natural when they focus back on the tab
+        setTimeout(checkPendingVerification, 1500);
+        
+        // Also listen for when they focus back on this window
+        window.addEventListener('focus', () => {
+            setTimeout(checkPendingVerification, 1000);
+        });
+    }
+    fetchDashboardNews();
+});
 </script>
 
 <template>
@@ -84,9 +126,9 @@ const formatDate = (d) => {
         </div>
         
         <div class="d-flex align-items-center gap-3">
-             <a v-if="!store.userProfile?.surveyCompleted" :href="store.content.qualtricsLink" target="_blank" class="btn btn-gold rounded-0 px-4 py-2 fw-bold shadow-sm text-navy d-none d-md-block">
+             <button v-if="!store.userProfile?.surveyCompleted" @click="handleSurveyClick(store.content.qualtricsLink)" class="btn btn-gold rounded-0 px-4 py-2 fw-bold shadow-sm text-navy d-none d-md-block">
                  Take Pilot Survey
-             </a>
+             </button>
              <div class="user-pill bg-white px-3 py-2 rounded-0 shadow-sm border border-light d-flex align-items-center gap-2">
                  <img :src="user.avatar || user.photoURL" class="rounded-circle border" width="32" height="32" referrerpolicy="no-referrer">
                  <div class="d-none d-sm-block">
@@ -140,9 +182,9 @@ const formatDate = (d) => {
                               <span class="fw-bold d-block mb-1">{{ survey.title }}</span>
                               <small class="text-white-50">⏱ Est: {{ survey.estTime }} • {{ survey.date }}</small>
                           </div>
-                          <a v-if="survey.status === 'Action Required'" :href="survey.actionUrl" target="_blank" class="btn btn-gold btn-sm rounded-0 px-4 fw-bold shadow-sm text-navy">
+                          <button v-if="survey.status === 'Action Required'" @click="handleSurveyClick(survey.actionUrl)" class="btn btn-gold btn-sm rounded-0 px-4 fw-bold shadow-sm text-navy">
                               Take Survey
-                          </a>
+                          </button>
                           <button v-else disabled class="btn btn-outline-light btn-sm rounded-0 px-4 fw-bold opacity-50">
                               <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="me-1 mb-1" viewBox="0 0 16 16"><path d="M8 1a2 2 0 0 1 2 2v4H6V3a2 2 0 0 1 2-2zm3 6V3a3 3 0 0 0-6 0v4a2 2 0 0 0-2 2v5a2 2 0 0 0 2 2h6a2 2 0 0 0 2-2V9a2 2 0 0 0-2-2z"/></svg>
                               Locked
@@ -190,6 +232,28 @@ const formatDate = (d) => {
       </section>
 
     </div>
+
+    <!-- SURVEY VERIFICATION MODAL -->
+    <transition name="fade">
+        <div v-if="showVerificationModal" class="modal-overlay d-flex justify-content-center align-items-center" style="position:fixed; top:0; left:0; width:100%; height:100%; background: rgba(27,44,87,0.7); z-index:11000;">
+            <div class="bg-white p-5 rounded-0 shadow-lg text-center mx-3" style="max-width: 450px;">
+                <div class="mb-4">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="60" height="60" fill="#bea429" class="bi bi-question-circle" viewBox="0 0 16 16">
+                      <path d="M8 15A7 7 0 1 1 8 1a7 7 0 0 1 0 14m0 1A8 8 0 1 0 8 0a8 8 0 0 0 0 16"/>
+                      <path d="M5.255 5.786a.237.237 0 0 0 .241.247h.825c.138 0 .248-.113.266-.25.09-.656.54-1.134 1.342-1.134.686 0 1.314.343 1.314 1.168 0 .635-.374.927-.965 1.371-.673.489-1.206 1.06-1.168 1.987l.003.217a.25.25 0 0 0 .25.246h.811a.25.25 0 0 0 .25-.25v-.105c0-.718.273-.927 1.01-1.486.609-.463 1.244-.977 1.244-2.056 0-1.511-1.276-2.241-2.673-2.241-1.267 0-2.655.59-2.75 2.286zm1.557 5.763c0 .533.425.927 1.01.927.609 0 1.028-.394 1.028-.927 0-.552-.42-.94-1.029-.94-.584 0-1.009.388-1.009.94z"/>
+                    </svg>
+                </div>
+                <h4 class="fw-bold text-navy mb-3">Did you complete the survey?</h4>
+                <p class="text-muted mb-4 small">We noticed you clicked the survey link. If you fully completed the AI Pilot Questionnaire on Qualtrics, let us know so we can update your status!</p>
+                
+                <div class="d-flex flex-column gap-2">
+                    <button @click="confirmSurveyCompleted" class="btn btn-gold rounded-0 py-2 fw-bold w-100 text-navy">Yes, I completed it</button>
+                    <button @click="declineSurveyCompleted" class="btn btn-light rounded-0 py-2 fw-bold w-100 text-muted border">No, I'll do it later</button>
+                </div>
+            </div>
+        </div>
+    </transition>
+
   </main>
 </template>
 
