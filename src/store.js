@@ -325,8 +325,11 @@ export const store = reactive({
   // --- CMS ACTIONS ---
   saveContent() {
       localStorage.setItem(CONTENT_KEY, JSON.stringify({ version: APP_VERSION, data: this.content }));
-      setDoc(doc(db, "global_content", "main_data"), JSON.parse(JSON.stringify(this.content)))
-        .catch(e => console.error("Save Error:", e));
+      return setDoc(doc(db, "global_content", "main_data"), JSON.parse(JSON.stringify(this.content)))
+        .catch(e => {
+            console.error("Save Error:", e);
+            throw e;
+        });
   },
 
   async uploadImage(file, path, onProgress) {

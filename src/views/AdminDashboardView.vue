@@ -111,11 +111,20 @@ const removeSocialPost = (index) => {
     draftContent.value.socialUpdates = newUpdates;
 };
 
-const publishChanges = () => {
+const publishChanges = async () => {
     store.content = JSON.parse(JSON.stringify(draftContent.value));
-    store.saveContent();
-    store.trackActivity("CMS Update", "Admin published global content changes");
-    alert("✅ All Changes Published Live!");
+    
+    try {
+        await store.saveContent();
+        store.trackActivity("CMS Update", "Admin published global content changes");
+        alert("✅ All Changes Published Live!");
+    } catch (error) {
+        if (error.code === 'permission-denied' || error.message.includes('not been used') || error.message.includes('PERMISSION_DENIED')) {
+            alert("❌ FAILED TO SAVE: Cloud Firestore is NOT enabled in your Firebase project! Please go to your Firebase Console, click 'Firestore Database' on the left menu, and click 'Create Database' to enable it. Once created, your changes will sync properly.");
+        } else {
+            alert("❌ FAILED TO SAVE: " + error.message);
+        }
+    }
 };
 
 const discardChanges = () => {
