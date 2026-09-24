@@ -1,5 +1,5 @@
 <script setup>
-import { ref } from 'vue';
+import { ref, watch } from 'vue';
 import { store } from '../store';
 import { auth, googleProvider } from '../firebase';
 import { signInWithPopup } from 'firebase/auth';
@@ -22,8 +22,12 @@ const isLoading = ref(false);
 const showPassword = ref(false);
 const showConfirmPassword = ref(false);
 
-const agreePolicies = ref(false);
+const agreePolicies = ref(localStorage.getItem('ra_agreed_policies') === 'true');
 const showPolicyModal = ref(false);
+
+watch(agreePolicies, (val) => {
+    localStorage.setItem('ra_agreed_policies', val.toString());
+});
 
 const handleRedirect = async () => {
     store.closeModal();
@@ -205,7 +209,7 @@ const toggleMode = () => {
             </span>
         </div>
         
-        <div v-if="!isLogin" class="form-check text-start mb-3 fade-in">
+        <div v-if="!isLogin && !agreePolicies" class="form-check text-start mb-3 fade-in">
             <input class="form-check-input" type="checkbox" v-model="agreePolicies" id="agreePolicies">
             <label class="form-check-label small text-white-50" for="agreePolicies">
                 I agree to the <span class="text-gold fw-bold text-decoration-underline" style="cursor:pointer;" @click.prevent="showPolicyModal = true">policies</span>.
