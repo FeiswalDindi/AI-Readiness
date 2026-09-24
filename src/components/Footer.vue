@@ -20,7 +20,7 @@ const handleAdminClick = () => {
   <footer class="bg-navy text-white pt-5 pb-3 mt-auto position-relative" style="z-index: 100;">
     <div class="container">
       
-      <div v-if="route.path !== '/contact'" class="text-center mb-5 pb-4 border-bottom border-white-10">
+      <div v-if="!store.userProfile?.surveyCompleted && route.path !== '/contact'" class="text-center mb-5 pb-4 border-bottom border-white-10">
           <h3 class="fw-bold text-white mb-3">Want to participate in the research?</h3>
           <p class="text-white-50 mb-4" style="max-width: 600px; margin: 0 auto;">
               Complete the pilot survey to earn 20 KES airtime and join the movement.

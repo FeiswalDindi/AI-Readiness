@@ -83,13 +83,13 @@ onUnmounted(() => {
             <div class="row align-items-center g-5">
                 
                 <!-- Left: Info & Actions -->
-                <div class="col-lg-6 text-center text-lg-start">
+                <div :class="store.userProfile?.surveyCompleted ? 'col-lg-10 mx-auto text-center' : 'col-lg-6 text-center text-lg-start'">
                     <transition name="fade" mode="out-in">
                         <div :key="currentSlide" v-if="slides.length > 0 && slides[currentSlide]">
                             <h1 class="display-4 fw-bold mb-4 animate-title text-white">
                                 {{ slides[currentSlide].title || store.content.about.title }}
                             </h1>
-                            <p class="lead mb-4 opacity-75 fs-5 animate-subtitle pe-lg-4">
+                            <p class="lead mb-4 opacity-75 fs-5 animate-subtitle" :class="{ 'pe-lg-4': !store.userProfile?.surveyCompleted }">
                                 {{ slides[currentSlide].subtitle || store.content.about.text }}
                             </p>
                         </div>
@@ -97,14 +97,14 @@ onUnmounted(() => {
                             <h1 class="display-4 fw-bold mb-4 animate-title text-white">
                                 {{ store.content.about.title }}
                             </h1>
-                            <p class="lead mb-4 opacity-75 fs-5 animate-subtitle pe-lg-4">
+                            <p class="lead mb-4 opacity-75 fs-5 animate-subtitle" :class="{ 'pe-lg-4': !store.userProfile?.surveyCompleted }">
                                 {{ store.content.about.text }}
                             </p>
                         </div>
                     </transition>
                     
-                    <div class="d-flex flex-column flex-sm-row gap-3 mt-4 animate-buttons w-100">
-                        <button @click="handleSurveyClick" class="btn btn-gold btn-lg px-4 py-3 rounded-pill fw-bold shadow-lg border-0">
+                    <div class="d-flex flex-column flex-sm-row gap-3 mt-4 animate-buttons w-100" :class="{ 'justify-content-center': store.userProfile?.surveyCompleted }">
+                        <button v-if="!store.userProfile?.surveyCompleted" @click="handleSurveyClick" class="btn btn-gold btn-lg px-4 py-3 rounded-pill fw-bold shadow-lg border-0">
                             Take Pilot Survey
                         </button>
                         <a :href="store.content.whatsappLink" target="_blank" class="btn btn-outline-light btn-lg px-4 py-3 rounded-pill fw-bold d-flex align-items-center justify-content-center gap-2">
@@ -115,7 +115,7 @@ onUnmounted(() => {
                 </div>
 
                 <!-- Right: Poster & Countdown -->
-                <div class="col-lg-6">
+                <div class="col-lg-6" v-if="!store.userProfile?.surveyCompleted">
                     <div class="glass-card p-4 text-center">
                         <h4 class="text-gold mb-3 fw-bold">Next Big Survey Drops In</h4>
                         
