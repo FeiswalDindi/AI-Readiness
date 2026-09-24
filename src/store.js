@@ -115,6 +115,20 @@ export const store = reactive({
       });
   },
 
+  // 1.5 GLOBAL CONTENT LISTENER
+  initContentListener() {
+      const docRef = doc(db, "global_content", "main_data");
+      onSnapshot(docRef, (snap) => {
+          if (snap.exists()) {
+              this.content = { ...this.content, ...snap.data() };
+              localStorage.setItem(CONTENT_KEY, JSON.stringify({ version: APP_VERSION, data: this.content }));
+          } else {
+              // First time setup, save default content to DB
+              this.saveContent();
+          }
+      });
+  },
+
   // 2. UNIVERSAL TRACKER
   async trackActivity(actionType, details = "") {
       try {

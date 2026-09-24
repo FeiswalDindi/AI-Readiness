@@ -13,6 +13,7 @@ const app = createApp(App)
 
 // 1. Initialize the Global Log Listener (So charts work immediately)
 store.initLogListener();
+store.initContentListener();
 
 app.use(router)
 
