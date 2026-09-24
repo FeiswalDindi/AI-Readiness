@@ -1,22 +1,17 @@
 <script setup>
-import { defineProps } from 'vue';
+import { defineProps, defineEmits } from 'vue';
 import Hero from '../Hero.vue';
 
-// We receive the "Draft" slides from the parent
 const props = defineProps(['slides']);
+const emit = defineEmits(['addSlide', 'removeSlide', 'updateSlide']);
 
 const addSlide = () => {
-    props.slides.push({
-        id: Date.now(),
-        image: 'https://images.unsplash.com/photo-1497366216548-37526070297c',
-        title: 'New Headline',
-        subtitle: 'New Subtitle'
-    });
+    emit('addSlide');
 };
 
 const removeSlide = (index) => {
     if (confirm("Remove this slide?")) {
-        props.slides.splice(index, 1);
+        emit('removeSlide', index);
     }
 };
 

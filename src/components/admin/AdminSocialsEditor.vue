@@ -1,19 +1,14 @@
 <script setup>
-import { defineProps } from 'vue';
+import { defineProps, defineEmits } from 'vue';
 const props = defineProps(['socials']);
+const emit = defineEmits(['addSocialPost', 'removeSocialPost']);
 
 const addSocialPost = () => { 
-    props.socials.unshift({ 
-        id: Date.now(), 
-        platform: 'LinkedIn', 
-        date: new Date().toISOString(), 
-        text: 'New update...', 
-        link: '#' 
-    }); 
+    emit('addSocialPost');
 };
 
 const removeSocialPost = (index) => { 
-    props.socials.splice(index, 1); 
+    emit('removeSocialPost', index);
 };
 
 const updateTimestamp = (post) => { 

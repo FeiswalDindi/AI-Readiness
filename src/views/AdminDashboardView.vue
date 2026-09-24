@@ -83,6 +83,34 @@ const addTeamMember = () => {
     ];
 };
 
+const addHeroSlide = () => {
+    if (!draftContent.value.heroSlides) draftContent.value.heroSlides = [];
+    draftContent.value.heroSlides = [
+        ...draftContent.value.heroSlides,
+        { id: Date.now(), image: 'https://images.unsplash.com/photo-1497366216548-37526070297c', title: 'New Headline', subtitle: 'New Subtitle' }
+    ];
+};
+
+const removeHeroSlide = (index) => {
+    const newSlides = [...draftContent.value.heroSlides];
+    newSlides.splice(index, 1);
+    draftContent.value.heroSlides = newSlides;
+};
+
+const addSocialPost = () => {
+    if (!draftContent.value.socialUpdates) draftContent.value.socialUpdates = [];
+    draftContent.value.socialUpdates = [
+        { id: Date.now(), platform: 'LinkedIn', date: new Date().toISOString(), text: 'New update...', link: '#' },
+        ...draftContent.value.socialUpdates
+    ];
+};
+
+const removeSocialPost = (index) => {
+    const newUpdates = [...draftContent.value.socialUpdates];
+    newUpdates.splice(index, 1);
+    draftContent.value.socialUpdates = newUpdates;
+};
+
 const publishChanges = () => {
     store.content = JSON.parse(JSON.stringify(draftContent.value));
     store.saveContent();
@@ -277,7 +305,11 @@ const generateReport = () => {
                   <button v-if="isSectionDirty(['heroSlides'])" @click="saveSection(['heroSlides'])" class="btn btn-sm btn-success fw-bold px-3 rounded-pill" style="z-index: 10;">Save Slider</button>
               </transition>
           </div>
-          <AdminHeroEditor :slides="draftContent.heroSlides" />
+          <AdminHeroEditor 
+              :slides="draftContent.heroSlides" 
+              @addSlide="addHeroSlide" 
+              @removeSlide="removeHeroSlide" 
+          />
       </div>
 
       <div class="row g-4 mb-5">
@@ -295,7 +327,11 @@ const generateReport = () => {
                       <button v-if="isSectionDirty(['socialUpdates'])" @click="saveSection(['socialUpdates'])" class="btn btn-sm btn-success fw-bold px-3 rounded-pill">Save Socials</button>
                   </transition>
               </div>
-              <AdminSocialsEditor :socials="draftContent.socialUpdates" />
+              <AdminSocialsEditor 
+                  :socials="draftContent.socialUpdates" 
+                  @addSocialPost="addSocialPost" 
+                  @removeSocialPost="removeSocialPost" 
+              />
           </div>
       </div>
 
