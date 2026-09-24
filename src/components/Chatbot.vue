@@ -69,6 +69,7 @@ const parseMessage = (rawText) => {
     if (!rawText) return '';
     let html = rawText.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>');
     html = html.replace(/^\* /gm, '• ');
+    html = html.replace(/\[(.*?)\]\((.*?)\)/g, '<a href="$2" target="_blank" class="text-gold text-decoration-underline fw-bold">$1</a>');
     html = html.replace(/\n/g, '<br>');
     return html;
 };
@@ -159,67 +160,22 @@ const sendMessage = async () => {
     // Create the empty white bubble immediately
     messages.value.push({ id: botMsgId, sender: 'bot', text: '' });
 
-    try {
-        const response = await fetch(
-            `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:streamGenerateContent?alt=sse&key=${API_KEY}`,
-            {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ contents: buildPromptHistory() })
-            }
-        );
-
-        if (!response.ok) {
-            throw new Error(`API Connection Failed: ${response.status}`);
-        }
-
-        const reader = response.body.getReader();
-        const decoder = new TextDecoder("utf-8");
-        let done = false;
-        let buffer = '';
-
-        while (!done) {
-            const { value, done: readerDone } = await reader.read();
-            done = readerDone;
-            
-            if (value) {
-                buffer += decoder.decode(value, { stream: true });
-                const lines = buffer.split('\n');
-                buffer = lines.pop(); // Keep incomplete lines in buffer
-                
-                for (const line of lines) {
-                    if (line.startsWith('data: ')) {
-                        const dataStr = line.substring(6).trim();
-                        if (dataStr === '[DONE]' || !dataStr) continue;
-                        
-                        try {
-                            const data = JSON.parse(dataStr);
-                            const textChunk = data.candidates?.[0]?.content?.parts?.[0]?.text || '';
-                            if (textChunk) {
-                                // Feed the text chunk to our smooth typer
-                                queueTextForTyping(botMsgId, textChunk);
-                            }
-                        } catch (e) { /* ignore JSON parse errors on partial chunks */ }
-                    }
-                }
-            }
-        }
-    } catch (error) {
-        console.warn("API Error caught, switching to simulated fallback.");
-        const fallbackText = "I'm currently experiencing connection issues. Please reach out to our team directly via WhatsApp or the Contact page for immediate assistance.";
-        // Even if it fails, simulate the typing so it looks natural!
-        queueTextForTyping(botMsgId, fallbackText);
-    } finally {
-        // Only unlock the UI after the visual typing is completely finished
+    setTimeout(() => {
+        const devMessage = "I am still under development and coming soon! For further assistance, please reach out via [WhatsApp](https://wa.me/254768980297).";
+        queueTextForTyping(botMsgId, devMessage);
+        
+        // Wait for typing queue to finish before unlocking
         const checkQueueInterval = setInterval(() => {
             if (typingQueue.length === 0 && !isFlushingQueue) {
                 clearInterval(checkQueueInterval);
                 isStreaming.value = false;
                 isTyping.value = false;
                 scrollToBottom();
+                saveChat();
             }
         }, 100);
-    }
+        
+    }, 1000);
 };
 </script>
 
