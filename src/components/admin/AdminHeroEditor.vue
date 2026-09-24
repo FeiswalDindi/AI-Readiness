@@ -66,14 +66,19 @@ const handleImageUpload = async (event, index) => {
                     <input v-model="slide.subtitle" class="form-control form-control-sm mb-2">
                     
                     <label class="small text-muted fw-bold">Image URL</label>
-                    <div class="input-group mb-2">
-                        <input v-model="slide.image" class="form-control form-control-sm text-muted">
-                        <input type="file" @change="e => handleImageUpload(e, index)" class="d-none" :id="'slideUpload_'+index" accept="image/*">
-                        <label :for="'slideUpload_'+index" class="input-group-text bg-white cursor-pointer fw-bold px-3 m-0 position-relative overflow-hidden" style="padding-top: 2px; padding-bottom: 2px;">
-                            <div v-if="uploadingState[index]" class="position-absolute top-0 start-0 h-100 bg-success opacity-25" :style="{ width: uploadProgress[index] + '%' }"></div>
-                            <span v-if="uploadingState[index]" class="position-relative z-2 small">{{ uploadProgress[index] }}%</span>
-                            <span v-else>Upload</span>
-                        </label>
+                    <div class="d-flex gap-2 mb-2">
+                        <div v-if="slide.image" class="border rounded shadow-sm overflow-hidden flex-shrink-0" style="width: 48px; height: 48px;">
+                            <img :src="slide.image" class="w-100 h-100 object-fit-cover" alt="Preview">
+                        </div>
+                        <div class="input-group">
+                            <input v-model="slide.image" class="form-control form-control-sm text-muted">
+                            <input type="file" @change="e => handleImageUpload(e, index)" class="d-none" :id="'slideUpload_'+index" accept="image/*">
+                            <label :for="'slideUpload_'+index" class="input-group-text bg-white cursor-pointer fw-bold px-3 m-0 position-relative overflow-hidden" style="padding-top: 2px; padding-bottom: 2px;">
+                                <div v-if="uploadingState[index]" class="position-absolute top-0 start-0 h-100 bg-success opacity-25" :style="{ width: uploadProgress[index] + '%' }"></div>
+                                <span v-if="uploadingState[index]" class="position-relative z-2 small">{{ uploadProgress[index] }}%</span>
+                                <span v-else>Upload</span>
+                            </label>
+                        </div>
                     </div>
                 </div>
              </div>

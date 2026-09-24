@@ -279,26 +279,36 @@ const generateReport = () => {
               </div>
               <div class="col-md-3">
                   <label class="form-label small fw-bold text-muted text-uppercase ls-1">Poster Image URL</label>
-                  <div class="input-group">
-                      <input type="url" v-model="draftContent.posterUrl" class="form-control bg-light border-0 py-3" placeholder="https://example.com/poster.jpg">
-                      <input type="file" @change="e => handleImageUpload(e, 'posterUrl')" class="d-none" id="posterUpload" accept="image/*">
-                      <label for="posterUpload" class="input-group-text bg-white cursor-pointer fw-bold px-3 position-relative overflow-hidden">
-                          <div v-if="uploadingState.posterUrl" class="position-absolute top-0 start-0 h-100 bg-success opacity-25" :style="{ width: uploadProgress.posterUrl + '%' }"></div>
-                          <span v-if="uploadingState.posterUrl" class="position-relative z-2 small">{{ uploadProgress.posterUrl }}%</span>
-                          <span v-else>Upload</span>
-                      </label>
+                  <div class="d-flex gap-2">
+                      <div v-if="draftContent.posterUrl" class="border rounded shadow-sm overflow-hidden flex-shrink-0" style="width: 48px; height: 48px;">
+                          <img :src="draftContent.posterUrl" class="w-100 h-100 object-fit-cover" alt="Preview">
+                      </div>
+                      <div class="input-group">
+                          <input type="url" v-model="draftContent.posterUrl" class="form-control bg-light border-0 py-3" placeholder="https://example.com/poster.jpg">
+                          <input type="file" @change="e => handleImageUpload(e, 'posterUrl')" class="d-none" id="posterUpload" accept="image/*">
+                          <label for="posterUpload" class="input-group-text bg-white cursor-pointer fw-bold px-3 position-relative overflow-hidden">
+                              <div v-if="uploadingState.posterUrl" class="position-absolute top-0 start-0 h-100 bg-success opacity-25" :style="{ width: uploadProgress.posterUrl + '%' }"></div>
+                              <span v-if="uploadingState.posterUrl" class="position-relative z-2 small">{{ uploadProgress.posterUrl }}%</span>
+                              <span v-else>Upload</span>
+                          </label>
+                      </div>
                   </div>
               </div>
               <div class="col-md-3">
                   <label class="form-label small fw-bold text-muted text-uppercase ls-1">Project Logo URL</label>
-                  <div class="input-group">
-                      <input type="url" v-model="draftContent.logoUrl" class="form-control bg-light border-0 py-3" placeholder="https://example.com/logo.jpg">
-                      <input type="file" @change="e => handleImageUpload(e, 'logoUrl')" class="d-none" id="logoUpload" accept="image/*">
-                      <label for="logoUpload" class="input-group-text bg-white cursor-pointer fw-bold px-3 position-relative overflow-hidden">
-                          <div v-if="uploadingState.logoUrl" class="position-absolute top-0 start-0 h-100 bg-success opacity-25" :style="{ width: uploadProgress.logoUrl + '%' }"></div>
-                          <span v-if="uploadingState.logoUrl" class="position-relative z-2 small">{{ uploadProgress.logoUrl }}%</span>
-                          <span v-else>Upload</span>
-                      </label>
+                  <div class="d-flex gap-2">
+                      <div v-if="draftContent.logoUrl" class="border rounded shadow-sm overflow-hidden flex-shrink-0" style="width: 48px; height: 48px;">
+                          <img :src="draftContent.logoUrl" class="w-100 h-100 object-fit-cover" alt="Preview">
+                      </div>
+                      <div class="input-group">
+                          <input type="url" v-model="draftContent.logoUrl" class="form-control bg-light border-0 py-3" placeholder="https://example.com/logo.jpg">
+                          <input type="file" @change="e => handleImageUpload(e, 'logoUrl')" class="d-none" id="logoUpload" accept="image/*">
+                          <label for="logoUpload" class="input-group-text bg-white cursor-pointer fw-bold px-3 position-relative overflow-hidden">
+                              <div v-if="uploadingState.logoUrl" class="position-absolute top-0 start-0 h-100 bg-success opacity-25" :style="{ width: uploadProgress.logoUrl + '%' }"></div>
+                              <span v-if="uploadingState.logoUrl" class="position-relative z-2 small">{{ uploadProgress.logoUrl }}%</span>
+                              <span v-else>Upload</span>
+                          </label>
+                      </div>
                   </div>
               </div>
               <div class="col-md-3">
@@ -382,14 +392,19 @@ const generateReport = () => {
                       <input type="text" v-model="member.name" class="form-control mb-2 fw-bold" placeholder="Name">
                       <input type="text" v-model="member.role" class="form-control mb-2" placeholder="Role">
                       
-                      <div class="input-group mb-2">
-                          <input type="url" v-model="member.imageUrl" class="form-control" placeholder="Image URL">
-                          <input type="file" @change="e => handleImageUpload(e, 'imageUrl', true, idx)" class="d-none" :id="'teamUpload_'+idx" accept="image/*">
-                          <label :for="'teamUpload_'+idx" class="input-group-text bg-white cursor-pointer fw-bold px-3 m-0 position-relative overflow-hidden">
-                              <div v-if="uploadingState['team_'+idx]" class="position-absolute top-0 start-0 h-100 bg-success opacity-25" :style="{ width: uploadProgress['team_'+idx] + '%' }"></div>
-                              <span v-if="uploadingState['team_'+idx]" class="position-relative z-2 small">{{ uploadProgress['team_'+idx] }}%</span>
-                              <span v-else>Upload</span>
-                          </label>
+                      <div class="d-flex gap-2 mb-2">
+                          <div v-if="member.imageUrl" class="border rounded shadow-sm overflow-hidden flex-shrink-0" style="width: 48px; height: 48px;">
+                              <img :src="member.imageUrl" class="w-100 h-100 object-fit-cover" alt="Preview">
+                          </div>
+                          <div class="input-group">
+                              <input type="url" v-model="member.imageUrl" class="form-control" placeholder="Image URL">
+                              <input type="file" @change="e => handleImageUpload(e, 'imageUrl', true, idx)" class="d-none" :id="'teamUpload_'+idx" accept="image/*">
+                              <label :for="'teamUpload_'+idx" class="input-group-text bg-white cursor-pointer fw-bold px-3 m-0 position-relative overflow-hidden">
+                                  <div v-if="uploadingState['team_'+idx]" class="position-absolute top-0 start-0 h-100 bg-success opacity-25" :style="{ width: uploadProgress['team_'+idx] + '%' }"></div>
+                                  <span v-if="uploadingState['team_'+idx]" class="position-relative z-2 small">{{ uploadProgress['team_'+idx] }}%</span>
+                                  <span v-else>Upload</span>
+                              </label>
+                          </div>
                       </div>
 
                       <textarea v-model="member.description" class="form-control" rows="2" placeholder="Description"></textarea>
