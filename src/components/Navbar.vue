@@ -75,7 +75,7 @@ onUnmounted(() => {
     <div class="container position-relative">
       
       <router-link class="navbar-brand fw-bold brand-container" to="/" @click="closeMenu">
-        <span class="brand-text" :class="isScrolled ? 'text-navy' : 'text-white'">AI Readiness</span>
+        <span class="brand-text" :class="[isScrolled ? 'text-navy shift-text' : 'text-white']">AI Readiness</span>
         <img :src="store.content.logoUrl || 'https://ui-avatars.com/api/?name=AR&background=bea429&color=1b2c57'" alt="Project Logo" class="brand-logo" :class="{ 'show-logo': isScrolled }">
       </router-link>
 
@@ -191,8 +191,9 @@ onUnmounted(() => {
 .bg-solid .navbar-toggler-icon { filter: invert(0); }
 
 /* BRANDING */
-.brand-container { position: relative; display: flex; align-items: center; height: 40px; min-width: 180px; overflow: hidden; }
+.brand-container { position: relative; display: flex; align-items: center; height: 40px; min-width: 230px; overflow: hidden; }
 .brand-text { font-size: 1.5rem; transition: all 0.4s ease-in-out; position: absolute; left: 0; top: 50%; transform: translateY(-50%); }
+.shift-text { left: 50px; }
 .brand-logo { position: absolute; left: 0; width: 40px; height: 40px; border-radius: 50%; object-fit: cover; opacity: 0; transform: translateY(150%); transition: all 0.4s ease-in-out; }
 .show-logo { opacity: 1; transform: translateY(0); }
 
