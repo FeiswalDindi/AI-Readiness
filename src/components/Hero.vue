@@ -44,7 +44,7 @@ onUnmounted(() => { clearInterval(slideInterval); });
                     <h1 class="display-3 fw-bold mb-4 animate-title text-white">
                         {{ slides[currentSlide].title }}
                     </h1>
-                    <p class="lead mb-5 opacity-75 fs-4 animate-subtitle">
+                    <p class="lead mb-5 opacity-75 fs-4 animate-subtitle" style="white-space: pre-wrap;">
                         {{ slides[currentSlide].subtitle }}
                     </p>
                   </div>

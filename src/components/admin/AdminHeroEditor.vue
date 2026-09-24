@@ -63,7 +63,7 @@ const handleImageUpload = async (event, index) => {
                     <input v-model="slide.title" class="form-control form-control-sm mb-2 fw-bold">
                     
                     <label class="small text-muted fw-bold">Subtitle</label>
-                    <input v-model="slide.subtitle" class="form-control form-control-sm mb-2">
+                    <textarea v-model="slide.subtitle" class="form-control form-control-sm mb-2" rows="3" placeholder="Enter subtitle text..."></textarea>
                     
                     <label class="small text-muted fw-bold">Image URL</label>
                     <div class="d-flex gap-2 mb-2">

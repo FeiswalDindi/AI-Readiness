@@ -89,7 +89,7 @@ onUnmounted(() => {
                             <h1 class="display-4 fw-bold mb-4 animate-title text-white">
                                 {{ slides[currentSlide].title || store.content.about.title }}
                             </h1>
-                            <p class="lead mb-4 opacity-75 fs-5 animate-subtitle pe-lg-4">
+                            <p class="lead mb-4 opacity-75 fs-5 animate-subtitle pe-lg-4" style="white-space: pre-wrap;">
                                 {{ slides[currentSlide].subtitle || store.content.about.text }}
                             </p>
                         </div>
@@ -97,7 +97,7 @@ onUnmounted(() => {
                             <h1 class="display-4 fw-bold mb-4 animate-title text-white">
                                 {{ store.content.about.title }}
                             </h1>
-                            <p class="lead mb-4 opacity-75 fs-5 animate-subtitle pe-lg-4">
+                            <p class="lead mb-4 opacity-75 fs-5 animate-subtitle pe-lg-4" style="white-space: pre-wrap;">
                                 {{ store.content.about.text }}
                             </p>
                         </div>
