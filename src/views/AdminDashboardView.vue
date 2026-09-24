@@ -593,3 +593,7 @@ const generateReport = () => {
     animation: pulseSave 2s infinite;
 }
 </style>
+
+<style scoped>
+.cursor-pointer { cursor: pointer !important; }
+</style>

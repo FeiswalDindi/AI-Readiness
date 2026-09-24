@@ -148,3 +148,6 @@ const handleImageUpload = async (event, index) => {
     font-size: 1.8rem !important;
 }
 </style>
+<style scoped>
+.cursor-pointer { cursor: pointer !important; }
+</style>
