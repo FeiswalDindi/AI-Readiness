@@ -246,7 +246,7 @@ const toggleMode = () => {
                     {{ store.content.policies || 'By creating an account, you consent to participate in the AI Readiness in Education research study.\n\nEmail Usage: Your email address will be securely stored in our database. We will use it exclusively to notify you when the Main AI Readiness Assessment survey is available.\n\nData Privacy: All data collected is strictly confidential and will only be used for research purposes. We will not share your personal information with third parties.' }}
                 </div>
                 <div class="d-flex gap-2 justify-content-end">
-                    <button class="btn btn-navy rounded-0 px-4 py-2 fw-bold text-white" @click="acceptPolicies">I Agree</button>
+                    <button class="btn rounded-0 px-4 py-2 fw-bold text-white" style="background-color: #1b2c57;" @click="acceptPolicies">I Agree</button>
                 </div>
             </div>
         </div>

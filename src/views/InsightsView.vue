@@ -95,12 +95,11 @@ const handleImageError = (e) => {
                 :src="store.content.logoUrl || 'https://ui-avatars.com/api/?name=AR&background=1b2c57&color=fff'" 
                 alt="Project Logo" 
                 class="banner-logo-img rounded-circle shadow-lg border border-4 border-gold"
-                style="width: 100px; height: 100px; object-fit: cover; background: white;"
+                style="width: 120px; height: 120px; object-fit: cover; background: transparent;"
             >
         </div>
 
-        <h6 class="text-gold ls-2 text-uppercase mb-3 fw-bold" v-scroll-reveal="{ delay: 100 }">Market Intelligence</h6>
-        <h1 class="display-3 fw-bold mb-3" v-scroll-reveal="{ delay: 200 }">Latest Insights</h1>
+        <h1 class="display-3 fw-bold mb-3" v-scroll-reveal="{ delay: 100 }">Market Intelligence</h1>
         <p class="lead text-white-50 mx-auto" style="max-width: 700px;" v-scroll-reveal="{ delay: 300 }">
             Curated updates on Policy, Technology, and Economic trends shaping our region.
         </p>
