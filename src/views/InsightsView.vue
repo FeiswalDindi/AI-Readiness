@@ -90,12 +90,12 @@ const handleImageError = (e) => {
     >
       <div class="container py-5 position-relative z-2 mt-4">
         
-        <div class="header-logo mx-auto mb-4" v-scroll-reveal>
+        <div class="header-logo mx-auto mb-4 rounded-circle shadow-lg border border-4 border-gold overflow-hidden bg-transparent d-flex align-items-center justify-content-center" v-scroll-reveal style="width: 120px; height: 120px;">
             <img 
                 :src="store.content.logoUrl || 'https://ui-avatars.com/api/?name=AR&background=1b2c57&color=fff'" 
                 alt="Project Logo" 
-                class="banner-logo-img rounded-circle shadow-lg border border-4 border-gold"
-                style="width: 120px; height: 120px; object-fit: cover; background: transparent;"
+                class="w-100 h-100"
+                style="object-fit: cover; transform: scale(1.15);"
             >
         </div>
 

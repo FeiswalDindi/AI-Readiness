@@ -81,7 +81,7 @@ export const store = reactive({
             name: 'Khan Ulberg', 
             role: 'Lead Researcher',
             description: 'Based in the UK, Khan is the lead researcher behind the AI Readiness Project and the primary author of the upcoming foundational research paper.',
-            imageUrl: 'https://ui-avatars.com/api/?name=Khan+Ulberg&background=1b2c57&color=fff'
+            imageUrl: 'https://ui-avatars.com/api/?name=UK&background=1b2c57&color=fff'
         },
         { 
             name: 'Madam Lucy Nabalanga', 

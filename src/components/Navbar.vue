@@ -194,8 +194,8 @@ onUnmounted(() => {
 .brand-container { position: relative; display: flex; align-items: center; height: 40px; min-width: 230px; overflow: hidden; }
 .brand-text { font-size: 1.5rem; transition: all 0.4s ease-in-out; position: absolute; left: 0; top: 50%; transform: translateY(-50%); }
 .shift-text { left: 50px; }
-.brand-logo { position: absolute; left: 0; width: 40px; height: 40px; border-radius: 50%; object-fit: cover; opacity: 0; transform: translateY(150%); transition: all 0.4s ease-in-out; }
-.show-logo { opacity: 1; transform: translateY(0); }
+.brand-logo { position: absolute; left: 0; width: 40px; height: 40px; border-radius: 50%; object-fit: cover; opacity: 0; transform: translateY(150%) scale(1.15); transition: all 0.4s ease-in-out; }
+.show-logo { opacity: 1; transform: translateY(0) scale(1.15); }
 
 /* AVATAR STYLES */
 .user-avatar-small { width: 32px; height: 32px; border-radius: 50%; overflow: hidden; background: #1b2c57; display: flex; align-items: center; justify-content: center; }
