@@ -79,7 +79,7 @@ onUnmounted(() => {
         </div>
         <div class="overlay"></div>
 
-        <div class="container position-relative z-2 pt-5 mt-5">
+        <div class="container position-relative z-2 pt-5 mt-5 pb-5">
             <div class="row align-items-center g-5">
                 
                 <!-- Left: Info & Actions -->
@@ -287,7 +287,7 @@ onUnmounted(() => {
 </template>
 
 <style scoped>
-.hero-section { min-height: 90vh; background-color: #1b2c57; position: relative; }
+.hero-section { min-height: 90vh; background-color: #1b2c57; position: relative; padding-bottom: 5rem; }
 .overlay {
     position: absolute; top: 0; left: 0; width: 100%; height: 100%;
     background: radial-gradient(circle at center, rgba(27, 44, 87, 0.8) 0%, rgba(15, 23, 42, 1) 100%); z-index: 1;
