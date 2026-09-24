@@ -22,12 +22,14 @@ const handleImageUpload = async (event, fieldName, isTeamMember = false, teamInd
     if (!file) return;
     
     const uploadKey = isTeamMember ? `team_${teamIndex}` : fieldName;
-    uploadingState.value[uploadKey] = true;
-    uploadProgress.value[uploadKey] = 0;
+    
+    // Force reactivity updates
+    uploadingState.value = { ...uploadingState.value, [uploadKey]: true };
+    uploadProgress.value = { ...uploadProgress.value, [uploadKey]: 0 };
     
     try {
         const url = await store.uploadImage(file, 'uploads', (prog) => {
-            uploadProgress.value[uploadKey] = Math.round(prog);
+            uploadProgress.value = { ...uploadProgress.value, [uploadKey]: Math.round(prog) };
         });
         if (isTeamMember) {
             draftContent.value.team[teamIndex][fieldName] = url;
@@ -38,8 +40,8 @@ const handleImageUpload = async (event, fieldName, isTeamMember = false, teamInd
         alert("Upload failed. Please ensure Firebase Storage rules allow writes.");
         console.error(e);
     } finally {
-        uploadingState.value[uploadKey] = false;
-        uploadProgress.value[uploadKey] = 0;
+        uploadingState.value = { ...uploadingState.value, [uploadKey]: false };
+        uploadProgress.value = { ...uploadProgress.value, [uploadKey]: 0 };
         event.target.value = ''; // reset file input
     }
 };

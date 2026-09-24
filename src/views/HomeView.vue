@@ -168,31 +168,6 @@ onUnmounted(() => {
         </div>
     </section>
 
-    <!-- SOCIAL UPDATES / COMMUNITY FEED -->
-    <section class="py-5 bg-light-navy" v-if="store.content.socialUpdates && store.content.socialUpdates.length > 0">
-        <div class="container py-5">
-            <div class="text-center mb-5">
-                <h6 class="text-gold fw-bold ls-2 mb-2 text-uppercase">Community Feed</h6>
-                <h2 class="fw-bold text-navy display-6">Latest Updates</h2>
-            </div>
-            
-            <div class="row g-4 justify-content-center">
-                <div class="col-md-6 col-lg-4" v-for="update in store.content.socialUpdates" :key="update.id">
-                    <div class="card h-100 border-0 shadow-sm rounded-4 overflow-hidden">
-                        <div class="card-body p-4 d-flex flex-column">
-                            <div class="d-flex justify-content-between align-items-center mb-3">
-                                <span class="badge bg-gold text-navy fw-bold">{{ update.platform }}</span>
-                                <small class="text-muted fw-bold">{{ new Date(update.date).toLocaleDateString() }}</small>
-                            </div>
-                            <p class="card-text text-muted mb-4 flex-grow-1" style="white-space: pre-wrap;">{{ update.text }}</p>
-                            <a v-if="update.link && update.link !== '#'" :href="update.link" target="_blank" class="btn btn-outline-navy fw-bold rounded-pill btn-sm mt-auto">View on {{ update.platform }} &rarr;</a>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </section>
-
     <!-- RESEARCH ADMINISTRATORS -->
     <section class="py-5 bg-white">
         <div class="container py-5 text-center">
@@ -206,6 +181,51 @@ onUnmounted(() => {
                         <h5 class="fw-bold text-navy mb-1">{{ member.name }}</h5>
                         <p class="text-gold small fw-bold mb-3 text-uppercase">{{ member.role }}</p>
                         <p class="text-muted small px-2">{{ member.description }}</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- SOCIAL UPDATES / COMMUNITY FEED -->
+    <section class="py-5 bg-light-navy" v-if="store.content.socialUpdates && store.content.socialUpdates.length > 0">
+        <div class="container py-5">
+            <div class="text-center mb-5">
+                <h6 class="text-gold fw-bold ls-2 mb-2 text-uppercase">Community Feed</h6>
+                <h2 class="fw-bold text-navy display-6">Latest Updates</h2>
+            </div>
+            
+            <div class="row g-4 justify-content-center">
+                <div class="col-md-6 col-lg-4" v-for="update in store.content.socialUpdates" :key="update.id">
+                    
+                    <!-- DYNAMIC CARD STYLING BASED ON PLATFORM -->
+                    <div class="card h-100 border-0 shadow-sm rounded-4 overflow-hidden social-card" :class="'card-' + update.platform.toLowerCase().replace(/[^a-z]/g, '')">
+                        <div class="card-body p-4 d-flex flex-column position-relative">
+                            
+                            <!-- Platform Icon -->
+                            <div class="platform-icon-wrap position-absolute top-0 end-0 m-3">
+                                <!-- Twitter(X) -->
+                                <svg v-if="update.platform === 'Twitter (X)'" xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="currentColor" class="text-dark" viewBox="0 0 16 16"><path d="M12.6.75h2.454l-5.36 6.142L16 15.25h-4.937l-3.867-5.07-4.425 5.07H.316l5.733-6.57L0 .75h5.063l3.495 4.633L12.601.75Zm-.86 13.028h1.36L4.323 2.145H2.865l8.875 11.633Z"/></svg>
+                                <!-- LinkedIn -->
+                                <svg v-else-if="update.platform === 'LinkedIn'" xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="#0077b5" viewBox="0 0 16 16"><path d="M0 1.146C0 .513.526 0 1.175 0h13.65C15.474 0 16 .513 16 1.146v13.708c0 .633-.526 1.146-1.175 1.146H1.175C.526 16 0 15.487 0 14.854V1.146zm4.943 12.248V6.169H2.542v7.225h2.401zm-1.2-8.212c.837 0 1.358-.554 1.358-1.248-.015-.709-.52-1.248-1.342-1.248-.822 0-1.359.54-1.359 1.248 0 .694.521 1.248 1.327 1.248h.016zm4.908 8.212V9.359c0-.216.016-.432.08-.586.173-.431.568-.878 1.232-.878.869 0 1.216.662 1.216 1.634v3.865h2.401V9.25c0-2.22-1.184-3.252-2.764-3.252-1.274 0-1.845.7-2.165 1.193v.025h-.016a5.54 5.54 0 0 1 .016-.025V6.169h-2.4c.03.678 0 7.225 0 7.225h2.4z"/></svg>
+                                <!-- Facebook -->
+                                <svg v-else xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="#1877F2" viewBox="0 0 16 16"><path d="M16 8.049c0-4.446-3.582-8.05-8-8.05C3.58 0-.002 3.603-.002 8.05c0 4.017 2.926 7.347 6.75 7.951v-5.625h-2.03V8.05H6.75V6.275c0-2.017 1.195-3.131 3.022-3.131.876 0 1.791.157 1.791.157v1.98h-1.009c-.993 0-1.303.621-1.303 1.258v1.51h2.218l-.354 2.326H9.25V16c3.824-.604 6.75-3.934 6.75-7.951z"/></svg>
+                            </div>
+
+                            <div class="d-flex align-items-center mb-3">
+                                <img src="https://ui-avatars.com/api/?name=AI+Readiness&background=1b2c57&color=fff" class="rounded-circle me-2" style="width: 40px; height: 40px;" alt="Avatar">
+                                <div>
+                                    <h6 class="mb-0 fw-bold text-dark">AI Readiness Project</h6>
+                                    <small class="text-muted" style="font-size: 0.75rem;">@AIReadiness &middot; {{ new Date(update.date).toLocaleDateString() }}</small>
+                                </div>
+                            </div>
+                            
+                            <p class="card-text text-dark mb-4 flex-grow-1" style="white-space: pre-wrap; font-size: 0.95rem;">{{ update.text }}</p>
+                            
+                            <a v-if="update.link && update.link !== '#'" :href="update.link" target="_blank" class="text-decoration-none mt-auto fw-bold" :class="update.platform === 'Twitter (X)' ? 'text-dark' : 'text-primary'">
+                                View full post &rarr;
+                            </a>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -291,4 +311,15 @@ onUnmounted(() => {
     background-color: #1b2c57;
     color: white;
 }
+
+.social-card {
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+.social-card:hover { transform: translateY(-5px); box-shadow: 0 10px 20px rgba(0,0,0,0.1) !important; }
+
+.card-twitterx { border-top: 4px solid #000 !important; background-color: #fff; }
+.card-linkedin { border-top: 4px solid #0077b5 !important; background-color: #f3f6f8; }
+.card-facebook { border-top: 4px solid #1877F2 !important; background-color: #f0f2f5; }
+
+.platform-icon-wrap svg { filter: drop-shadow(0 2px 4px rgba(0,0,0,0.1)); }
 </style>

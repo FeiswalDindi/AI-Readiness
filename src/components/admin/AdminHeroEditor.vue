@@ -30,19 +30,20 @@ const handleImageUpload = async (event, index) => {
     const file = event.target.files[0];
     if (!file) return;
     
-    uploadingState.value[index] = true;
-    uploadProgress.value[index] = 0;
+    uploadingState.value = { ...uploadingState.value, [index]: true };
+    uploadProgress.value = { ...uploadProgress.value, [index]: 0 };
+    
     try {
         const url = await store.uploadImage(file, 'slides', (prog) => {
-            uploadProgress.value[index] = Math.round(prog);
+            uploadProgress.value = { ...uploadProgress.value, [index]: Math.round(prog) };
         });
         props.slides[index].image = url;
     } catch (e) {
         alert("Upload failed. Ensure Firebase Storage is enabled.");
         console.error(e);
     } finally {
-        uploadingState.value[index] = false;
-        uploadProgress.value[index] = 0;
+        uploadingState.value = { ...uploadingState.value, [index]: false };
+        uploadProgress.value = { ...uploadProgress.value, [index]: 0 };
         event.target.value = '';
     }
 };
