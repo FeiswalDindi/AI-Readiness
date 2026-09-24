@@ -440,7 +440,7 @@ onUnmounted(() => {
     .shape-left, .shape-right {
         position: relative !important;
         clip-path: none !important;
-        border-radius: 20px !important;
+        border-radius: 0 !important;
         width: 100% !important;
         height: auto !important;
     }

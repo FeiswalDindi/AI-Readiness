@@ -335,7 +335,7 @@ const generateReport = () => {
               </transition>
           </div>
           <div class="row g-4" v-if="draftContent.pageBackgrounds">
-              <div class="col-md-4" v-for="(bgLabel, bgKey) in { insights: 'Insights', contact: 'Contact Us', careers: 'Careers', partners: 'Partners', services: 'Services', about: 'About Us' }" :key="bgKey">
+              <div class="col-md-4" v-for="(bgLabel, bgKey) in { insights: 'Insights', contact: 'Contact Us', careers: 'Careers', partners: 'Partners', services: 'Services', about: 'About Us', focus_job: 'Focus: Job Market', focus_curriculum: 'Focus: Curriculum', focus_tools: 'Focus: AI Tools' }" :key="bgKey">
                   <label class="form-label small fw-bold text-muted text-uppercase ls-1">{{ bgLabel }} Hero Image</label>
                   <div class="d-flex gap-2">
                       <div v-if="draftContent.pageBackgrounds[bgKey]" class="border rounded shadow-sm overflow-hidden flex-shrink-0" style="width: 48px; height: 48px;">
