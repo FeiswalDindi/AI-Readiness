@@ -274,75 +274,63 @@ export const store = reactive({
   },
 
   async uploadImage(file, path, onProgress) {
-      const { ref: storageRef, uploadBytes, getDownloadURL } = await import('firebase/storage');
-      const { storage } = await import('./firebase');
-      
-      const fileRef = storageRef(storage, `${path}/${Date.now()}_${file.name}`);
-      
-      // Simulate progress for UI liveliness since uploadBytes doesn't emit progress natively
-      let progress = 0;
-      const interval = setInterval(() => {
-          progress += 15;
-          if (progress > 90) progress = 90; // hold at 90% until done
-          if (onProgress) onProgress(progress);
-      }, 100);
+      return new Promise((resolve, reject) => {
+          // Simulate a fast progress bar for UI liveliness
+          let progress = 0;
+          const interval = setInterval(() => {
+              progress += 20;
+              if (progress > 90) progress = 90;
+              if (onProgress) onProgress(progress);
+          }, 50);
 
-      try {
-          const uploadPromise = uploadBytes(fileRef, file);
-          const timeoutPromise = new Promise((_, reject) => {
-              setTimeout(() => reject(new Error("Upload timed out.")), 10000);
-          });
-          
-          await Promise.race([uploadPromise, timeoutPromise]);
-          clearInterval(interval);
-          if (onProgress) onProgress(100);
-          
-          const url = await getDownloadURL(fileRef);
-          return url;
-      } catch (error) {
-          clearInterval(interval);
-          console.warn("Firebase Storage failed. Falling back to compressed Base64.", error);
-          
-          // FALLBACK: Compress image and convert to Base64
-          return new Promise((resolve, reject) => {
-              const reader = new FileReader();
-              reader.readAsDataURL(file);
-              reader.onload = event => {
-                  const img = new Image();
-                  img.src = event.target.result;
-                  img.onload = () => {
-                      const canvas = document.createElement('canvas');
-                      const MAX_WIDTH = 800;
-                      const MAX_HEIGHT = 800;
-                      let width = img.width;
-                      let height = img.height;
+          const reader = new FileReader();
+          reader.readAsDataURL(file);
+          reader.onload = event => {
+              const img = new Image();
+              img.src = event.target.result;
+              img.onload = () => {
+                  const canvas = document.createElement('canvas');
+                  const MAX_WIDTH = 1200;
+                  const MAX_HEIGHT = 1200;
+                  let width = img.width;
+                  let height = img.height;
 
-                      if (width > height) {
-                          if (width > MAX_WIDTH) {
-                              height *= MAX_WIDTH / width;
-                              width = MAX_WIDTH;
-                          }
-                      } else {
-                          if (height > MAX_HEIGHT) {
-                              width *= MAX_HEIGHT / height;
-                              height = MAX_HEIGHT;
-                          }
+                  // Maintain aspect ratio while downscaling
+                  if (width > height) {
+                      if (width > MAX_WIDTH) {
+                          height *= MAX_WIDTH / width;
+                          width = MAX_WIDTH;
                       }
-                      canvas.width = width;
-                      canvas.height = height;
-                      const ctx = canvas.getContext('2d');
-                      ctx.drawImage(img, 0, 0, width, height);
-                      
-                      // Compress to JPEG with 0.7 quality
-                      const dataUrl = canvas.toDataURL('image/jpeg', 0.7);
-                      if (onProgress) onProgress(100);
-                      resolve(dataUrl);
-                  };
-                  img.onerror = () => reject(new Error("Base64 Fallback failed."));
+                  } else {
+                      if (height > MAX_HEIGHT) {
+                          width *= MAX_HEIGHT / height;
+                          height = MAX_HEIGHT;
+                      }
+                  }
+                  canvas.width = width;
+                  canvas.height = height;
+                  
+                  // Draw and compress
+                  const ctx = canvas.getContext('2d');
+                  ctx.drawImage(img, 0, 0, width, height);
+                  const dataUrl = canvas.toDataURL('image/jpeg', 0.8);
+                  
+                  clearInterval(interval);
+                  if (onProgress) onProgress(100);
+                  
+                  // Return the highly compressed string directly to be saved in Firestore Database
+                  resolve(dataUrl);
               };
-              reader.onerror = () => reject(new Error("File read failed."));
-          });
-      }
+              img.onerror = () => {
+                  clearInterval(interval);
+                  reject(new Error("Image processing failed."));
+              };
+          };
+          reader.onerror = () => {
+              clearInterval(interval);
+              reject(new Error("File read failed."));
+          };
+      });
   },
 
   addResource(resource) {
