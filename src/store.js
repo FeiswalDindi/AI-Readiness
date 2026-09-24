@@ -142,6 +142,15 @@ export const store = reactive({
       onSnapshot(docRef, (snap) => {
           if (snap.exists()) {
               Object.assign(this.content, snap.data());
+              
+              // DB MIGRATION PATCH: Force Khan's avatar to read 'UK'
+              if (this.content.team && this.content.team.length > 0 && this.content.team[0].name.includes('Khan')) {
+                  if (this.content.team[0].imageUrl.includes('Khan+Ulberg')) {
+                      this.content.team[0].imageUrl = 'https://ui-avatars.com/api/?name=UK&background=1b2c57&color=fff';
+                      this.saveContent(); 
+                  }
+              }
+
               localStorage.setItem(CONTENT_KEY, JSON.stringify({ version: APP_VERSION, data: this.content }));
           } else {
               // First time setup, save default content to DB
