@@ -385,7 +385,7 @@ export const store = reactive({
         });
   },
 
-  async uploadImage(file, pathStr, onProgress, options = {}) {
+    async uploadImage(file, pathStr, onProgress, options = {}) {
       // 1. Client-Side Image Compression (shrinks 5MB photos down to ~30KB-80KB in 50ms)
       let compressed = null;
       try {
@@ -400,63 +400,50 @@ export const store = reactive({
 
       const fileToUpload = compressed ? compressed.file : file;
       const fallbackDataUrl = compressed ? compressed.dataUrl : null;
+      const fileName = `${Date.now()}_${file.name.replace(/[^a-zA-Z0-9.]/g, '_')}`;
+      const fullPath = `${pathStr}/${fileName}`;
 
-      // 2. Attempt Firebase Cloud Storage Upload
+      // 2. Direct Google Cloud Storage Upload via REST API
+      const BUCKET_NAME = "ai-readiness-b3883-media";
+      const uploadUrl = `https://storage.googleapis.com/upload/storage/v1/b/${BUCKET_NAME}/o?uploadType=media&name=${encodeURIComponent(fullPath)}`;
+
       return new Promise((resolve, reject) => {
-          const fileName = `${Date.now()}_${file.name.replace(/[^a-zA-Z0-9.]/g, '_')}`;
-          const fullPath = `${pathStr}/${fileName}`;
-          const fileRef = storageRef(storage, fullPath);
-          const uploadTask = uploadBytesResumable(fileRef, fileToUpload);
+          const xhr = new XMLHttpRequest();
+          xhr.open("POST", uploadUrl, true);
+          xhr.setRequestHeader("Content-Type", fileToUpload.type || "image/jpeg");
 
-          // 15-second safety timeout so UI never hangs indefinitely at 0%
-          const timeoutId = setTimeout(() => {
-              uploadTask.cancel();
-              const err = new Error("Firebase Storage upload timed out. The storage bucket may not be activated yet in Firebase Console.");
-              err.code = 'STORAGE_TIMEOUT';
+          if (xhr.upload && onProgress) {
+              xhr.upload.onprogress = (event) => {
+                  if (event.lengthComputable && event.total > 0) {
+                      const percent = Math.round((event.loaded / event.total) * 100);
+                      onProgress(percent);
+                  }
+              };
+          }
+
+          xhr.onload = () => {
+              if (xhr.status >= 200 && xhr.status < 300) {
+                  if (onProgress) onProgress(100);
+                  const publicUrl = `https://storage.googleapis.com/${BUCKET_NAME}/${fullPath}`;
+                  resolve(publicUrl);
+              } else {
+                  console.error("GCS Direct Upload Failed:", xhr.status, xhr.responseText);
+                  const err = new Error(`Google Cloud Storage upload error (HTTP ${xhr.status})`);
+                  err.code = `GCS_${xhr.status}`;
+                  err.fallbackDataUrl = fallbackDataUrl;
+                  reject(err);
+              }
+          };
+
+          xhr.onerror = () => {
+              console.error("GCS Network Error");
+              const err = new Error("Network error while connecting to Google Cloud Storage.");
+              err.code = "NETWORK_ERROR";
               err.fallbackDataUrl = fallbackDataUrl;
               reject(err);
-          }, 15000);
+          };
 
-          uploadTask.on(
-              'state_changed',
-              (snapshot) => {
-                  if (snapshot.totalBytes > 0) {
-                      const progress = (snapshot.bytesTransferred / snapshot.totalBytes) * 100;
-                      if (onProgress) onProgress(progress);
-                  }
-              },
-              (error) => {
-                  clearTimeout(timeoutId);
-                  console.error("Firebase Storage Upload Error:", error);
-
-                  let readableMsg = error.message;
-                  let errCode = error.code || 'storage/unknown';
-
-                  if (errCode === 'storage/unknown' || error.message?.includes('unknown') || error.message?.includes('404')) {
-                      readableMsg = "Cloud Storage bucket does not exist or has not been activated yet in Firebase Console. Go to Firebase Console -> Storage -> Click 'Get started'.";
-                      errCode = 'BUCKET_NOT_FOUND';
-                  } else if (errCode === 'storage/unauthorized') {
-                      readableMsg = "Storage Security Rules rejected the upload. Go to Firebase Console -> Storage -> Rules and set: allow read, write: if true;";
-                      errCode = 'PERMISSION_DENIED';
-                  }
-
-                  const enrichedErr = new Error(readableMsg);
-                  enrichedErr.code = errCode;
-                  enrichedErr.originalError = error;
-                  enrichedErr.fallbackDataUrl = fallbackDataUrl;
-                  reject(enrichedErr);
-              },
-              async () => {
-                  clearTimeout(timeoutId);
-                  try {
-                      const downloadURL = await getDownloadURL(uploadTask.snapshot.ref);
-                      if (onProgress) onProgress(100);
-                      resolve(downloadURL);
-                  } catch (urlErr) {
-                      reject(urlErr);
-                  }
-              }
-          );
+          xhr.send(fileToUpload);
       });
   },
 

@@ -1,6 +1,6 @@
 /**
- * Firebase Diagnostics & Storage Health Checker
- * Real-time checks for Firestore 1MB document limit, rules expiration, and Cloud Storage bucket presence.
+ * Firebase & Google Cloud Storage Diagnostics
+ * Real-time checks for Firestore 1MB document limit, rules expiration, and Google Cloud Storage bucket presence.
  */
 
 const STORAGE_BUCKET = "ai-readiness-b3883-media";
@@ -8,57 +8,32 @@ const FIRESTORE_MAX_BYTES = 1048576; // 1 MiB hard limit
 
 export async function checkStorageStatus() {
     try {
-        const response = await fetch(`https://firebasestorage.googleapis.com/v0/b/${STORAGE_BUCKET}/o`, {
+        // Probe Google Cloud Storage directly
+        const response = await fetch(`https://storage.googleapis.com/storage/v1/b/${STORAGE_BUCKET}`, {
             method: 'GET'
         });
+
+        if (response.status === 200 || response.status === 401 || response.status === 403) {
+            return {
+                status: 'OK',
+                code: response.status,
+                title: 'Google Cloud Storage Active',
+                badge: 'Active & Connected',
+                badgeClass: 'bg-success',
+                reason: 'Google Cloud Media Bucket is provisioned and ready for uploads.',
+                action: 'No action needed.'
+            };
+        }
 
         if (response.status === 404) {
             return {
                 status: 'NOT_FOUND',
                 code: 404,
-                title: 'Storage Bucket Not Activated',
-                badge: 'Not Activated',
+                title: 'Storage Bucket Not Found',
+                badge: 'Not Found (404)',
                 badgeClass: 'bg-danger',
-                reason: 'The Cloud Storage bucket has not been initialized yet in Google Firebase Console.',
-                action: 'Go to Firebase Console -> Storage -> Click "Get started" to create your bucket.'
-            };
-        }
-
-        if (response.status === 412) {
-            return {
-                status: 'NEEDS_FIREBASE_LINK',
-                code: 412,
-                title: 'Bucket Ready (Pending Firebase Link)',
-                badge: 'One Click in Firebase',
-                badgeClass: 'bg-warning text-dark',
-                reason: 'Bucket created in Google Cloud! Simply open the Firebase Console Storage page once to connect it.',
-                action: 'Open Firebase Console -> Storage to finish automatic pairing.'
-            };
-        }
-
-        if (response.status === 401 || response.status === 403) {
-            // Note: 401/403 on listing the whole bucket /o root is normal for standard rules,
-            // but means the bucket DEFINITELY exists!
-            return {
-                status: 'BUCKET_EXISTS',
-                code: response.status,
-                title: 'Storage Bucket Active',
-                badge: 'Active',
-                badgeClass: 'bg-success',
-                reason: 'Storage bucket is provisioned in Google Cloud.',
-                action: 'Ensure Storage rules have allow read, write: if true;'
-            };
-        }
-
-        if (response.status === 200) {
-            return {
-                status: 'OK',
-                code: 200,
-                title: 'Storage Ready',
-                badge: 'Ready & Open',
-                badgeClass: 'bg-success',
-                reason: 'Storage is fully operational.',
-                action: 'No action needed.'
+                reason: 'The Cloud Storage bucket does not exist in Google Cloud.',
+                action: 'Verify bucket creation in Google Cloud Console.'
             };
         }
 
@@ -66,10 +41,10 @@ export async function checkStorageStatus() {
             status: 'UNKNOWN',
             code: response.status,
             title: `HTTP ${response.status}`,
-            badge: 'Warning',
+            badge: 'Checking',
             badgeClass: 'bg-warning text-dark',
             reason: `Storage returned HTTP status ${response.status}.`,
-            action: 'Verify Storage configuration in Firebase Console.'
+            action: 'Verify Storage configuration in Google Cloud Console.'
         };
     } catch (err) {
         return {
