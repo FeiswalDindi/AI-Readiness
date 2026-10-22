@@ -3,7 +3,7 @@
  * Real-time checks for Firestore 1MB document limit, rules expiration, and Cloud Storage bucket presence.
  */
 
-const STORAGE_BUCKET = "ai-readiness-b3883.firebasestorage.app";
+const STORAGE_BUCKET = "ai-readiness-b3883-media";
 const FIRESTORE_MAX_BYTES = 1048576; // 1 MiB hard limit
 
 export async function checkStorageStatus() {

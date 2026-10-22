@@ -8,7 +8,7 @@ const firebaseConfig = {
   apiKey: "AIzaSyBSdouCS5OGRZ_0rZnZEj5e8bAFivjdsOw",
   authDomain: "ai-readiness-b3883.firebaseapp.com",
   projectId: "ai-readiness-b3883",
-  storageBucket: "ai-readiness-b3883.firebasestorage.app",
+  storageBucket: "ai-readiness-b3883-media",
   messagingSenderId: "480767747886",
   appId: "1:480767747886:web:f9b743198bb3ee207afcbf",
   measurementId: "G-E2BQXJN380"
