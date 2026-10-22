@@ -1,6 +1,7 @@
 <script setup>
 import confetti from 'canvas-confetti';
 import { ref, watch, onMounted, computed } from 'vue';
+import { getDocSizeDetails, checkStorageStatus, checkFirestoreExpiry } from '../utils/firebaseDiagnostics';
 import { store } from '../store';
 import { useRouter } from 'vue-router';
 
@@ -20,38 +21,106 @@ const showMobileMenu = ref(false);
 
 const uploadingState = ref({});
 const uploadProgress = ref({});
+const storageHealth = ref(null);
+const isCheckingStorage = ref(false);
+const isOptimizing = ref(false);
+const optimizeResult = ref(null);
+const showStorageModal = ref(false);
+const showFirestoreExpiryModal = ref(false);
+const showUploadErrorModal = ref(false);
+const uploadErrorData = ref(null);
+const ruleCopied = ref(false);
+const firestoreExpiry = ref(checkFirestoreExpiry());
+
+const docSize = computed(() => getDocSizeDetails(draftContent.value || store.content));
+
+const checkStorageNow = async () => {
+    isCheckingStorage.value = true;
+    storageHealth.value = await checkStorageStatus();
+    isCheckingStorage.value = false;
+};
+
+onMounted(async () => {
+    await checkStorageNow();
+});
+
+const applyImageUrl = (fieldName, url, isTeamMember, teamIndex) => {
+    if (isTeamMember) {
+        draftContent.value.team[teamIndex][fieldName] = url;
+        saveSection(['team']);
+    } else if (fieldName.includes('.')) {
+        const [parent, child] = fieldName.split('.');
+        draftContent.value[parent][child] = url;
+        saveSection([parent]);
+    } else {
+        draftContent.value[fieldName] = url;
+        saveSection(['countdownDate', 'posterUrl', 'logoUrl', 'phoneNumber']);
+    }
+};
+
+const useFallbackImage = () => {
+    if (!uploadErrorData.value?.fallbackDataUrl) return;
+    const { fieldName, fallbackDataUrl, isTeamMember, teamIndex } = uploadErrorData.value;
+    applyImageUrl(fieldName, fallbackDataUrl, isTeamMember, teamIndex);
+    showUploadErrorModal.value = false;
+    confetti({ particleCount: 70, spread: 60 });
+};
+
+const handleOptimizeDb = async () => {
+    if (isOptimizing.value) return;
+    isOptimizing.value = true;
+    optimizeResult.value = null;
+    try {
+        const res = await store.optimizeContentStorage();
+        draftContent.value = JSON.parse(JSON.stringify(store.content));
+        optimizeResult.value = res;
+        confetti({ particleCount: 80, spread: 70, origin: { y: 0.6 } });
+    } catch (err) {
+        alert("Optimization error: " + err.message);
+    } finally {
+        isOptimizing.value = false;
+    }
+};
+
+const copyToClipboard = async (text) => {
+    try {
+        await navigator.clipboard.writeText(text);
+        ruleCopied.value = true;
+        setTimeout(() => { ruleCopied.value = false; }, 2500);
+    } catch (e) {
+        alert("Copied text:\n" + text);
+    }
+};
 const handleImageUpload = async (event, fieldName, isTeamMember = false, teamIndex = null) => {
     const file = event.target.files[0];
     if (!file) return;
     
     const uploadKey = isTeamMember ? `team_${teamIndex}` : fieldName;
-    
-    // Force reactivity updates
     uploadingState.value = { ...uploadingState.value, [uploadKey]: true };
     uploadProgress.value = { ...uploadProgress.value, [uploadKey]: 0 };
     
     try {
-        const url = await store.uploadImage(file, 'uploads', (prog) => {
+        const url = await store.uploadImage(file, isTeamMember ? 'team' : 'uploads', (prog) => {
             uploadProgress.value = { ...uploadProgress.value, [uploadKey]: Math.round(prog) };
         });
-        if (isTeamMember) {
-            draftContent.value.team[teamIndex][fieldName] = url;
-            saveSection(['team']);
-        } else if (fieldName.includes('.')) {
-            const [parent, child] = fieldName.split('.');
-            draftContent.value[parent][child] = url;
-            saveSection([parent]);
-        } else {
-            draftContent.value[fieldName] = url;
-            saveSection(['countdownDate', 'posterUrl', 'logoUrl', 'phoneNumber']); // Just to be safe, save the whole settings section
-        }
+        applyImageUrl(fieldName, url, isTeamMember, teamIndex);
+        confetti({ particleCount: 70, spread: 60, origin: { y: 0.7 } });
     } catch (e) {
-        alert("Upload failed. Please ensure Firebase Storage rules allow writes.");
-        console.error(e);
+        console.error("Upload handler caught error:", e);
+        uploadErrorData.value = {
+            title: e.code === 'BUCKET_NOT_FOUND' ? 'Cloud Storage Bucket Not Activated' : (e.code === 'PERMISSION_DENIED' ? 'Storage Security Rules Denied' : 'Image Upload Failed'),
+            message: e.message || 'Upload failed.',
+            code: e.code || 'UNKNOWN',
+            fieldName,
+            isTeamMember,
+            teamIndex,
+            fallbackDataUrl: e.fallbackDataUrl
+        };
+        showUploadErrorModal.value = true;
     } finally {
         uploadingState.value = { ...uploadingState.value, [uploadKey]: false };
         uploadProgress.value = { ...uploadProgress.value, [uploadKey]: 0 };
-        event.target.value = ''; // reset file input
+        event.target.value = '';
     }
 };
 
@@ -229,6 +298,103 @@ const generateReport = () => {
                       <button @click="publishChanges" class="btn btn-navy rounded-0 fw-bold px-4 py-2 d-flex align-items-center gap-2 shadow-sm hover-lift pulse-btn">Publish All Changes</button>
                   </div>
               </transition>
+          </div>
+      </div>
+
+      
+      <!-- FIRESTORE EXPIRATION ALERT BANNER -->
+      <div v-if="firestoreExpiry.isExpiringSoon || firestoreExpiry.isExpired" class="alert alert-warning border-0 rounded-0 shadow-sm d-flex flex-column flex-md-row justify-content-between align-items-center p-3 mb-4 gap-3">
+          <div class="d-flex align-items-center gap-3">
+              <span class="fs-3">⚠️</span>
+              <div>
+                  <strong class="text-dark">Firebase Firestore Action Needed:</strong> 
+                  Your database 30-Day Test Mode rules expire on <span class="badge bg-dark rounded-0">{{ firestoreExpiry.expiryDate }}</span> (in {{ firestoreExpiry.daysLeft }} day{{ firestoreExpiry.daysLeft === 1 ? '' : 's' }}). Update rules to avoid client access lockout.
+              </div>
+          </div>
+          <button @click="showFirestoreExpiryModal = true" class="btn btn-navy btn-sm rounded-0 fw-bold px-3 py-2 text-nowrap">
+              View 1-Step Fix Guide
+          </button>
+      </div>
+
+      <!-- SYSTEM STORAGE & CLOUD HEALTH PANEL -->
+      <div class="row g-3 mb-4">
+          <!-- CARD 1: FIRESTORE DOCUMENT SIZE -->
+          <div class="col-md-6">
+              <div class="card border-0 shadow-sm p-4 bg-white rounded-0 h-100 position-relative">
+                  <div class="d-flex justify-content-between align-items-start mb-2">
+                      <div>
+                          <h6 class="fw-bold text-navy mb-1 d-flex align-items-center gap-2">
+                              <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2" class="text-gold"><path stroke-linecap="round" stroke-linejoin="round" d="M4 7v10c0 2.21 3.582 4 8 4s8-1.79 8-4V7M4 7c0 2.21 3.582 4 8 4s8-1.79 8-4M4 7c0-2.21 3.582-4 8-4s8 1.79 8 4m0 5c0 2.21-3.582 4-8 4s-8-1.79-8-4" /></svg>
+                              Database Storage (Firestore Document)
+                          </h6>
+                          <small class="text-muted">Strict limit: 1,024 KB per document</small>
+                      </div>
+                      <span class="badge rounded-0 px-2 py-1 fw-bold" :class="docSize.badgeClass">
+                          {{ docSize.percentUsed }}% Used
+                      </span>
+                  </div>
+
+                  <div class="progress rounded-0 my-2" style="height: 10px;">
+                      <div class="progress-bar" :class="docSize.percentUsed > 85 ? 'bg-danger' : (docSize.percentUsed > 65 ? 'bg-warning' : 'bg-success')" :style="{ width: docSize.percentUsed + '%' }"></div>
+                  </div>
+
+                  <div class="d-flex justify-content-between small text-muted mb-3">
+                      <span><strong>{{ docSize.sizeKB }} KB</strong> used</span>
+                      <span><strong>{{ docSize.remainingKB }} KB</strong> remaining</span>
+                  </div>
+
+                  <div v-if="optimizeResult" class="alert alert-success py-2 px-3 small rounded-0 mb-3">
+                      ✅ Freed <strong>{{ optimizeResult.freedKB }} KB</strong>! Current size is now <strong>{{ optimizeResult.newSizeKB }} KB</strong>.
+                  </div>
+
+                  <div class="d-flex gap-2 mt-auto">
+                      <button @click="handleOptimizeDb" class="btn btn-outline-primary btn-sm rounded-0 fw-bold d-flex align-items-center gap-1" :disabled="isOptimizing">
+                          <span v-if="isOptimizing" class="spinner-border spinner-border-sm me-1"></span>
+                          <span>{{ isOptimizing ? 'Optimizing...' : '⚡ Optimize Database (Free Up Space)' }}</span>
+                      </button>
+                  </div>
+              </div>
+          </div>
+
+          <!-- CARD 2: FIREBASE CLOUD STORAGE -->
+          <div class="col-md-6">
+              <div class="card border-0 shadow-sm p-4 bg-white rounded-0 h-100 position-relative">
+                  <div class="d-flex justify-content-between align-items-start mb-2">
+                      <div>
+                          <h6 class="fw-bold text-navy mb-1 d-flex align-items-center gap-2">
+                              <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2" class="text-gold"><path stroke-linecap="round" stroke-linejoin="round" d="M3 15a4 4 0 004 4h9a5 5 0 10-.1-9.999 5.002 5.002 0 00-9.78 2.096A4.001 4.001 0 003 15z" /></svg>
+                              Image Vault (Firebase Cloud Storage)
+                          </h6>
+                          <small class="text-muted">Dedicated storage for photos, posters & backgrounds</small>
+                      </div>
+                      <span v-if="storageHealth" class="badge rounded-0 px-2 py-1 fw-bold" :class="storageHealth.badgeClass">
+                          {{ storageHealth.badge }}
+                      </span>
+                      <span v-else class="badge bg-secondary rounded-0 px-2 py-1">Checking...</span>
+                  </div>
+
+                  <p class="small text-muted my-2">
+                      <span v-if="storageHealth?.status === 'OK' || storageHealth?.status === 'BUCKET_EXISTS'" class="text-success fw-bold">
+                          ● Connected: Images upload directly to Google Cloud Storage.
+                      </span>
+                      <span v-else-if="storageHealth?.status === 'NOT_FOUND'" class="text-danger fw-bold">
+                          ⚠ Storage bucket is not created yet in Google Cloud. Click "Setup Guide" below.
+                      </span>
+                      <span v-else class="text-muted">
+                          Checking Firebase Cloud Storage connection...
+                      </span>
+                  </p>
+
+                  <div class="d-flex gap-2 mt-auto">
+                      <button @click="showStorageModal = true" class="btn btn-navy btn-sm rounded-0 fw-bold">
+                          📖 Storage Setup & Rules Guide
+                      </button>
+                      <button @click="checkStorageNow" class="btn btn-light border btn-sm rounded-0 fw-bold" :disabled="isCheckingStorage">
+                          <span v-if="isCheckingStorage" class="spinner-border spinner-border-sm me-1"></span>
+                          <span>{{ isCheckingStorage ? 'Checking...' : '🔄 Check Status' }}</span>
+                      </button>
+                  </div>
+              </div>
           </div>
       </div>
 
@@ -543,6 +709,140 @@ const generateReport = () => {
         </div>
     </div>
     <div v-if="showMobileMenu" class="sidebar-overlay fade-in" @click="showMobileMenu = false"></div>
+
+  
+    <!-- UPLOAD ERROR & FALLBACK MODAL -->
+    <div v-if="showUploadErrorModal && uploadErrorData" class="modal-backdrop-custom d-flex align-items-center justify-content-center">
+        <div class="bg-white p-4 p-md-5 rounded-0 shadow-lg border" style="width: 580px; max-width: 95%;">
+            <div class="d-flex justify-content-between align-items-center mb-3 border-bottom pb-2">
+                <h5 class="fw-bold text-navy mb-0 d-flex align-items-center gap-2">
+                    <span class="text-danger">⚠️</span> {{ uploadErrorData.title }}
+                </h5>
+                <button @click="showUploadErrorModal = false" class="btn-close"></button>
+            </div>
+
+            <div class="alert alert-danger py-2 px-3 small rounded-0 mb-3">
+                <strong>Why this happened:</strong> {{ uploadErrorData.message }}
+            </div>
+
+            <div v-if="uploadErrorData.code === 'BUCKET_NOT_FOUND'" class="mb-4">
+                <h6 class="fw-bold text-navy small text-uppercase">How to fix in Firebase Console (30 seconds):</h6>
+                <ol class="small text-muted ps-3 mb-3">
+                    <li class="mb-1">Go to <a href="https://console.firebase.google.com/project/ai-readiness-b3883/storage" target="_blank" class="fw-bold text-navy">Firebase Console -> Storage</a>.</li>
+                    <li class="mb-1">Click the <strong>"Get started"</strong> button (Accept default settings and click Done).</li>
+                    <li class="mb-1">Click the <strong>"Rules"</strong> tab and paste:</li>
+                </ol>
+                <div class="bg-light p-2 border rounded-0 font-monospace small position-relative mb-2">
+                    <code>rules_version = '2';<br>service firebase.storage {<br>&nbsp;&nbsp;match /b/{bucket}/o {<br>&nbsp;&nbsp;&nbsp;&nbsp;match /{allPaths=**} {<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;allow read, write: if true;<br>&nbsp;&nbsp;&nbsp;&nbsp;}<br>&nbsp;&nbsp;}<br>}</code>
+                </div>
+            </div>
+
+            <div v-else-if="uploadErrorData.code === 'PERMISSION_DENIED'" class="mb-4">
+                <h6 class="fw-bold text-navy small text-uppercase">How to fix Storage Rules:</h6>
+                <p class="small text-muted mb-2">Your Cloud Storage rules currently deny write access. Open Firebase Console -> Storage -> Rules, set <code>allow read, write: if true;</code>, and click Publish.</p>
+            </div>
+
+            <div class="d-flex flex-wrap gap-2 justify-content-end pt-3 border-top">
+                <button v-if="uploadErrorData.fallbackDataUrl" @click="useFallbackImage" class="btn btn-navy rounded-0 fw-bold px-3 py-2">
+                    ⚡ Use Compressed Image Now (Fallback)
+                </button>
+                <a href="https://console.firebase.google.com/project/ai-readiness-b3883/storage" target="_blank" class="btn btn-outline-primary rounded-0 fw-bold px-3 py-2">
+                    Open Storage in Firebase
+                </a>
+                <button @click="showUploadErrorModal = false" class="btn btn-light border rounded-0 px-3 py-2">
+                    Close
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- FIREBASE STORAGE SETUP GUIDE MODAL -->
+    <div v-if="showStorageModal" class="modal-backdrop-custom d-flex align-items-center justify-content-center">
+        <div class="bg-white p-4 p-md-5 rounded-0 shadow-lg border" style="width: 600px; max-width: 95%;">
+            <div class="d-flex justify-content-between align-items-center mb-3 border-bottom pb-2">
+                <h5 class="fw-bold text-navy mb-0">Firebase Cloud Storage Setup Guide</h5>
+                <button @click="showStorageModal = false" class="btn-close"></button>
+            </div>
+
+            <p class="small text-muted mb-3">
+                Cloud Storage hosts all image uploads (posters, slides, team photos) without using up your Firestore 1MB document limit.
+            </p>
+
+            <h6 class="fw-bold text-navy small text-uppercase mb-2">3 Simple Steps to Activate Storage:</h6>
+            <ol class="small text-muted ps-3 mb-3">
+                <li class="mb-2">Open <a href="https://console.firebase.google.com/project/ai-readiness-b3883/storage" target="_blank" class="fw-bold text-navy">Firebase Console Storage</a>.</li>
+                <li class="mb-2">If you see a <strong>"Get started"</strong> button, click it and click Done to create your bucket.</li>
+                <li class="mb-2">Click the <strong>"Rules"</strong> tab at the top, replace the rules with the code below, and click <strong>"Publish"</strong>:</li>
+            </ol>
+
+            <div class="bg-dark text-white p-3 rounded-0 font-monospace small mb-3 position-relative">
+                <pre class="m-0"><code>rules_version = '2';
+service firebase.storage {
+  match /b/{bucket}/o {
+    match /{allPaths=**} {
+      allow read, write: if true;
+    }
+  }
+}</code></pre>
+                <button @click="copyToClipboard(`rules_version = '2';\nservice firebase.storage {\n  match /b/{bucket}/o {\n    match /{allPaths=**} {\n      allow read, write: if true;\n    }\n  }\n}`)" class="btn btn-sm btn-outline-light rounded-0 position-absolute top-0 end-0 m-2">
+                    {{ ruleCopied ? '✓ Copied!' : 'Copy Rule' }}
+                </button>
+            </div>
+
+            <div class="d-flex justify-content-end gap-2 pt-3 border-top">
+                <a href="https://console.firebase.google.com/project/ai-readiness-b3883/storage" target="_blank" class="btn btn-navy rounded-0 fw-bold px-3 py-2">
+                    Open Firebase Storage Console
+                </a>
+                <button @click="showStorageModal = false" class="btn btn-light border rounded-0 px-3 py-2">
+                    Done
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- FIRESTORE EXPIRATION 1-STEP FIX MODAL -->
+    <div v-if="showFirestoreExpiryModal" class="modal-backdrop-custom d-flex align-items-center justify-content-center">
+        <div class="bg-white p-4 p-md-5 rounded-0 shadow-lg border" style="width: 600px; max-width: 95%;">
+            <div class="d-flex justify-content-between align-items-center mb-3 border-bottom pb-2">
+                <h5 class="fw-bold text-navy mb-0">Firestore Database Expiration (Email Fix)</h5>
+                <button @click="showFirestoreExpiryModal = false" class="btn-close"></button>
+            </div>
+
+            <div class="alert alert-info py-2 px-3 small rounded-0 mb-3">
+                <strong>Why did you receive this email from Firebase?</strong><br>
+                When you created your Firestore database in September, it was in 30-Day "Test Mode" expiring on <strong>October 24, 2026</strong>. In {{ firestoreExpiry.daysLeft }} day(s), Firebase will lock all requests unless you update the rules.
+            </div>
+
+            <h6 class="fw-bold text-navy small text-uppercase mb-2">How to update Firestore Rules:</h6>
+            <ol class="small text-muted ps-3 mb-3">
+                <li class="mb-2">Open <a href="https://console.firebase.google.com/project/ai-readiness-b3883/firestore/databases/-default-/security/rules" target="_blank" class="fw-bold text-navy">Firebase Console -> Firestore Database -> Rules</a>.</li>
+                <li class="mb-2">Replace whatever is in the editor with this permanent rule:</li>
+            </ol>
+
+            <div class="bg-dark text-white p-3 rounded-0 font-monospace small mb-3 position-relative">
+                <pre class="m-0"><code>rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    match /{document=**} {
+      allow read, write: if true;
+    }
+  }
+}</code></pre>
+                <button @click="copyToClipboard(`rules_version = '2';\nservice cloud.firestore {\n  match /databases/{database}/documents {\n    match /{document=**} {\n      allow read, write: if true;\n    }\n  }\n}`)" class="btn btn-sm btn-outline-light rounded-0 position-absolute top-0 end-0 m-2">
+                    {{ ruleCopied ? '✓ Copied!' : 'Copy Rule' }}
+                </button>
+            </div>
+
+            <div class="d-flex justify-content-end gap-2 pt-3 border-top">
+                <a href="https://console.firebase.google.com/project/ai-readiness-b3883/firestore/databases/-default-/security/rules" target="_blank" class="btn btn-navy rounded-0 fw-bold px-3 py-2">
+                    Open Firestore Rules in Firebase
+                </a>
+                <button @click="showFirestoreExpiryModal = false" class="btn btn-light border rounded-0 px-3 py-2">
+                    Done
+                </button>
+            </div>
+        </div>
+    </div>
 
   </main>
 </template>

@@ -1,6 +1,7 @@
 <script setup>
 import { computed, ref, watch } from 'vue';
 import { useRouter } from 'vue-router';
+import { store } from '../store';
 
 const props = defineProps(['serviceId']);
 const router = useRouter();
@@ -107,13 +108,13 @@ watch(() => props.serviceId, () => {
 <template>
   <main class="services-page bg-light pb-5">
     
-    <section class="page-header py-5 bg-navy text-white text-center">
+    <section class="page-header py-5 bg-navy text-white text-center" :style="store.content.pageBackgrounds?.services ? `background-image: linear-gradient(rgba(27, 44, 87, 0.85), rgba(27, 44, 87, 0.95)), url(${store.content.pageBackgrounds.services}); background-size: cover; background-position: center;` : ''">
       <div class="container py-5 mt-4">
           
         <div class="header-logo mx-auto mb-4" v-scroll-reveal>
             <img 
                 v-if="!imgFailed" 
-                src="/favicon.jpeg" 
+                :src="store.content.logoUrl || '/favicon.jpeg'" 
                 alt="RA Logo" 
                 @error="imgFailed = true" 
                 class="banner-logo-img"

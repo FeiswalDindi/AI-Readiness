@@ -1,6 +1,8 @@
 import { reactive } from 'vue';
 import { db, auth, storage } from './firebase';
 import { ref as storageRef, uploadBytesResumable, getDownloadURL } from 'firebase/storage';
+import { compressImage } from './utils/imageCompressor';
+import { getDocSizeDetails, checkStorageStatus } from './utils/firebaseDiagnostics';
 import { 
     doc, setDoc, getDoc, onSnapshot, collection, addDoc, serverTimestamp, query, orderBy, limit 
 } from 'firebase/firestore'; 
@@ -52,6 +54,8 @@ export const store = reactive({
   activityLogs: [],
   isLoadingLogs: true,
   isDataReady: false,
+  storageHealth: null,
+  docSizeInfo: null,
 
   content: loadContent() || {
     heroSlides: [], 
@@ -356,37 +360,163 @@ export const store = reactive({
 
   // --- CMS ACTIONS ---
   saveContent() {
+      const sizeInfo = getDocSizeDetails(this.content);
+      this.docSizeInfo = sizeInfo;
+      
+      if (sizeInfo.sizeBytes >= 1048576) {
+          const errMsg = `Cannot save! Content size is ${(sizeInfo.sizeBytes / 1024).toFixed(1)} KB, which exceeds the 1,024 KB Firestore limit. Please click 'Optimize Database' to shrink embedded images or use Firebase Storage.`;
+          console.error(errMsg);
+          alert(errMsg);
+          return Promise.reject(new Error(errMsg));
+      }
+
       localStorage.setItem(CONTENT_KEY, JSON.stringify({ version: APP_VERSION, data: this.content }));
       return setDoc(doc(db, "global_content", "main_data"), JSON.parse(JSON.stringify(this.content)))
         .catch(e => {
-            console.error("Save Error:", e); alert("Failed to save changes! The data might be too large (e.g. images over 1MB). Please try again.");
+            console.error("Save Error:", e);
+            if (e.code === 'permission-denied') {
+                alert("Permission denied! Your Cloud Firestore rules may have expired (Test Mode expires in 30 days). Please update your Firestore Database Rules in Firebase Console to: allow read, write: if true;");
+            } else if (e.code === 'resource-exhausted' || (e.message && e.message.includes('1,048,576'))) {
+                alert("Database limit exceeded! The content is too large (over 1MB). Please click 'Optimize Database' in the admin panel to compress oversized images.");
+            } else {
+                alert("Failed to save changes: " + e.message);
+            }
             throw e;
         });
   },
 
-  async uploadImage(file, pathStr, onProgress) {
-        return new Promise((resolve, reject) => {
-            const fileName = `${Date.now()}_${file.name.replace(/[^a-zA-Z0-9.]/g, '_')}`;
-            const fullPath = `${pathStr}/${fileName}`;
-            const fileRef = storageRef(storage, fullPath);
-            const uploadTask = uploadBytesResumable(fileRef, file);
+  async uploadImage(file, pathStr, onProgress, options = {}) {
+      // 1. Client-Side Image Compression (shrinks 5MB photos down to ~30KB-80KB in 50ms)
+      let compressed = null;
+      try {
+          compressed = await compressImage(file, {
+              maxWidth: options.maxWidth || (pathStr === 'team' ? 400 : 1600),
+              maxHeight: options.maxHeight || (pathStr === 'team' ? 400 : 1600),
+              quality: options.quality || 0.75
+          });
+      } catch (compErr) {
+          console.warn("Client compression skipped/failed:", compErr);
+      }
 
-            uploadTask.on(
-                'state_changed',
-                (snapshot) => {
-                    const progress = (snapshot.bytesTransferred / snapshot.totalBytes) * 100;
-                    if (onProgress) onProgress(progress);
-                },
-                (error) => {
-                    reject(error);
-                },
-                async () => {
-                    const downloadURL = await getDownloadURL(uploadTask.snapshot.ref);
-                    resolve(downloadURL);
-                }
-            );
-        });
-    },
+      const fileToUpload = compressed ? compressed.file : file;
+      const fallbackDataUrl = compressed ? compressed.dataUrl : null;
+
+      // 2. Attempt Firebase Cloud Storage Upload
+      return new Promise((resolve, reject) => {
+          const fileName = `${Date.now()}_${file.name.replace(/[^a-zA-Z0-9.]/g, '_')}`;
+          const fullPath = `${pathStr}/${fileName}`;
+          const fileRef = storageRef(storage, fullPath);
+          const uploadTask = uploadBytesResumable(fileRef, fileToUpload);
+
+          // 15-second safety timeout so UI never hangs indefinitely at 0%
+          const timeoutId = setTimeout(() => {
+              uploadTask.cancel();
+              const err = new Error("Firebase Storage upload timed out. The storage bucket may not be activated yet in Firebase Console.");
+              err.code = 'STORAGE_TIMEOUT';
+              err.fallbackDataUrl = fallbackDataUrl;
+              reject(err);
+          }, 15000);
+
+          uploadTask.on(
+              'state_changed',
+              (snapshot) => {
+                  if (snapshot.totalBytes > 0) {
+                      const progress = (snapshot.bytesTransferred / snapshot.totalBytes) * 100;
+                      if (onProgress) onProgress(progress);
+                  }
+              },
+              (error) => {
+                  clearTimeout(timeoutId);
+                  console.error("Firebase Storage Upload Error:", error);
+
+                  let readableMsg = error.message;
+                  let errCode = error.code || 'storage/unknown';
+
+                  if (errCode === 'storage/unknown' || error.message?.includes('unknown') || error.message?.includes('404')) {
+                      readableMsg = "Cloud Storage bucket does not exist or has not been activated yet in Firebase Console. Go to Firebase Console -> Storage -> Click 'Get started'.";
+                      errCode = 'BUCKET_NOT_FOUND';
+                  } else if (errCode === 'storage/unauthorized') {
+                      readableMsg = "Storage Security Rules rejected the upload. Go to Firebase Console -> Storage -> Rules and set: allow read, write: if true;";
+                      errCode = 'PERMISSION_DENIED';
+                  }
+
+                  const enrichedErr = new Error(readableMsg);
+                  enrichedErr.code = errCode;
+                  enrichedErr.originalError = error;
+                  enrichedErr.fallbackDataUrl = fallbackDataUrl;
+                  reject(enrichedErr);
+              },
+              async () => {
+                  clearTimeout(timeoutId);
+                  try {
+                      const downloadURL = await getDownloadURL(uploadTask.snapshot.ref);
+                      if (onProgress) onProgress(100);
+                      resolve(downloadURL);
+                  } catch (urlErr) {
+                      reject(urlErr);
+                  }
+              }
+          );
+      });
+  },
+
+  async optimizeContentStorage() {
+      let count = 0;
+      const originalBytes = JSON.stringify(this.content).length;
+
+      const tryShrink = async (dataUrl, maxDim = 1200, quality = 0.7) => {
+          if (!dataUrl || typeof dataUrl !== 'string' || !dataUrl.startsWith('data:image')) {
+              return dataUrl;
+          }
+          if (dataUrl.length < 15000) return dataUrl; // already small
+          try {
+              const res = await compressImage(dataUrl, { maxWidth: maxDim, maxHeight: maxDim, quality });
+              count++;
+              return res.dataUrl;
+          } catch (e) {
+              return dataUrl;
+          }
+      };
+
+      if (this.content.logoUrl) {
+          this.content.logoUrl = await tryShrink(this.content.logoUrl, 300, 0.8);
+      }
+      if (this.content.posterUrl) {
+          this.content.posterUrl = await tryShrink(this.content.posterUrl, 1200, 0.7);
+      }
+      if (Array.isArray(this.content.heroSlides)) {
+          for (let s of this.content.heroSlides) {
+              if (s && s.image) s.image = await tryShrink(s.image, 1200, 0.7);
+          }
+      }
+      if (Array.isArray(this.content.team)) {
+          for (let m of this.content.team) {
+              if (m && m.imageUrl) m.imageUrl = await tryShrink(m.imageUrl, 300, 0.75);
+          }
+      }
+      if (this.content.pageBackgrounds) {
+          for (let k of Object.keys(this.content.pageBackgrounds)) {
+              if (this.content.pageBackgrounds[k]) {
+                  this.content.pageBackgrounds[k] = await tryShrink(this.content.pageBackgrounds[k], 1000, 0.65);
+              }
+          }
+      }
+
+      await this.saveContent();
+      const newBytes = JSON.stringify(this.content).length;
+      return {
+          optimizedCount: count,
+          freedKB: ((originalBytes - newBytes) / 1024).toFixed(1),
+          newSizeKB: (newBytes / 1024).toFixed(1)
+      };
+  },
+
+  async refreshDiagnostics() {
+      const storageRes = await checkStorageStatus();
+      this.storageHealth = storageRes;
+      this.docSizeInfo = getDocSizeDetails(this.content);
+      return { storage: storageRes, docSize: this.docSizeInfo };
+  },
 
   addResource(resource) {
       if (!this.content.resources) this.content.resources = [];

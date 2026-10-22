@@ -9,6 +9,9 @@ node_modules
 # Production build folder (You will generate this later!)
 dist
 
+# Backups
+firestore_backup_*.json
+
 # Environment variables (THIS HIDES YOUR API KEY!)
 .env
 .env.*

@@ -1,5 +1,6 @@
 <script setup>
 import { ref } from 'vue';
+import { store } from '../store';
 
 // Tracks if about.png fails to load
 const imgFailed = ref(false);
@@ -14,13 +15,13 @@ const handleReadMore = () => {
 <template>
   <div class="about-page-wrapper">
       
-    <section class="page-banner bg-navy position-relative overflow-hidden text-center py-5">
+    <section class="page-banner bg-navy position-relative overflow-hidden text-center py-5" :style="store.content.pageBackgrounds?.about ? `background-image: linear-gradient(rgba(27, 44, 87, 0.85), rgba(27, 44, 87, 0.95)), url(${store.content.pageBackgrounds.about}); background-size: cover; background-position: center;` : ''">
         <div class="container position-relative z-2">
             
             <div class="header-logo mx-auto mb-4">
                 <img 
                     v-if="!imgFailed" 
-                    src="/about.png" 
+                    :src="store.content.logoUrl || '/about.png'" 
                     alt="About Us Logo" 
                     @error="imgFailed = true" 
                     class="banner-logo-img"

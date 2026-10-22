@@ -35,9 +35,17 @@ const handleImageUpload = async (event, index) => {
             uploadProgress.value = { ...uploadProgress.value, [index]: Math.round(prog) };
         });
         props.slides[index].image = url;
+        confetti({ particleCount: 60, spread: 55, origin: { y: 0.6 } });
     } catch (e) {
-        alert("Upload failed. Ensure Firebase Storage is enabled.");
-        console.error(e);
+        console.error("Hero slide upload error:", e);
+        if (e.fallbackDataUrl) {
+            if (confirm(`${e.message}\n\nWould you like to use this compressed image directly on this slide now?`)) {
+                props.slides[index].image = e.fallbackDataUrl;
+                confetti({ particleCount: 50, spread: 50 });
+            }
+        } else {
+            alert("Upload failed: " + e.message);
+        }
     } finally {
         uploadingState.value = { ...uploadingState.value, [index]: false };
         uploadProgress.value = { ...uploadProgress.value, [index]: 0 };
