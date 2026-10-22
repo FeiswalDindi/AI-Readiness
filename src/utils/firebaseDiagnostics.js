@@ -24,6 +24,18 @@ export async function checkStorageStatus() {
             };
         }
 
+        if (response.status === 412) {
+            return {
+                status: 'NEEDS_FIREBASE_LINK',
+                code: 412,
+                title: 'Bucket Ready (Pending Firebase Link)',
+                badge: 'One Click in Firebase',
+                badgeClass: 'bg-warning text-dark',
+                reason: 'Bucket created in Google Cloud! Simply open the Firebase Console Storage page once to connect it.',
+                action: 'Open Firebase Console -> Storage to finish automatic pairing.'
+            };
+        }
+
         if (response.status === 401 || response.status === 403) {
             // Note: 401/403 on listing the whole bucket /o root is normal for standard rules,
             // but means the bucket DEFINITELY exists!
